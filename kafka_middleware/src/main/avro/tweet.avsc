@@ -1,0 +1,37 @@
+{
+  "name": "Tweet",
+  "type": "record",
+  "namespace": "kafka.modell",
+  "fields": [
+    {
+      "name": "author",
+      "type": "string"
+    },
+    {
+      "name": "content",
+      "type": "string"
+    },
+    {
+      "name": "timestamp",
+      "type": "string"
+    },
+    {
+      "name": "location",
+      "type": "string"
+    },
+    {
+      "name": "tags",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "name": "mentions",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    }
+  ]
+}
