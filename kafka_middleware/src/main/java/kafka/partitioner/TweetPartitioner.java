@@ -5,12 +5,13 @@ import org.apache.kafka.common.Cluster;
 
 import java.util.Map;
 
-public class LocationPartitioner implements Partitioner {
+public class TweetPartitioner implements Partitioner {
 
 
     @Override
     public int partition(String s, Object o, byte[] bytes, Object o1, byte[] bytes1, Cluster cluster) {
-        return PartitionMap.getInstance().getPartitionByLocationKey((String) o);
+        //TODO
+        return 1;
     }
 
     @Override

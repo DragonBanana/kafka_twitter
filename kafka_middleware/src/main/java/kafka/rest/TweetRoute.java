@@ -1,18 +1,23 @@
 package kafka.rest;
 
 import com.google.gson.Gson;
+import kafka.model.Tweet;
+
+import org.slf4j.LoggerFactory;
 
 import static spark.Spark.*;
 
-public class TwitterRoute {
+public class TweetRoute {
 
     public static void configureRoutes() {
-        path("/api/contacts", () -> {
-            get("", (request, response) -> service.findAll(), new Gson()::toJson);
-            get("/:id", (request, response) -> service.findById(request), new Gson()::toJson);
-            post("", (request, response) -> service.save(request, gson), new Gson()::toJson);
-            put("", (request, response) -> service.update(request, gson), new Gson()::toJson);
-            delete("", (request, response) -> service.delete(request), new Gson()::toJson);
+
+        post("/tweets", (request, response) -> {
+
+            response.type("application/json");
+            response.status(200);
+            Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
+            new TweetStub().save(tweet);
+            return "Tweet created" + new Gson().toJson(tweet);
         });
     }
 }

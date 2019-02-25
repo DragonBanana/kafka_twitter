@@ -1,7 +1,7 @@
 {
   "name": "Tweet",
   "type": "record",
-  "namespace": "kafka.modell",
+  "namespace": "kafka.model",
   "fields": [
     {
       "name": "author",
