@@ -14,7 +14,7 @@ public class Subscription {
     private Long lastPoll;
 
     /**
-     * Taags followedUsers by the user
+     * Tags followedUsers by the user
      */
     private Set<String> tags = new HashSet<>();
 

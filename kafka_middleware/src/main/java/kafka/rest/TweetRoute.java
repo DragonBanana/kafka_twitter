@@ -18,5 +18,15 @@ public class TweetRoute {
             new TweetStub().save(tweet);
             return "Tweet created" + new Gson().toJson(tweet);
         });
+
+        get("/tweets/{filter}/latest",(request, response) -> {
+
+            String id = request.cookie("id");
+            response.type("application/json");
+            response.status(200);
+            //TODO how to save the filter from the request
+            //should we create a class o just a collection?
+            //new TweetStub().findTweets(id,filter);
+        });
     }
 }

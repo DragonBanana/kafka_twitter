@@ -50,7 +50,30 @@ public class TweetStub {
 
     }
 
+    /**
+     * Main function for searching tweets given the filters.
+     * @param id of requester.
+     * @param filters.
+     * @return the latest tweet filtered using the filters param.
+     */
+    //TODO choose how to save the filters.
+    //public List<Tweet> findTweets(String id,  f){
+        //TODO
+        //return null
+    //}
 
+
+
+    /**
+     * Return the latest tweet filtered by location.
+     * @param id the identifier of the requester.
+     * @param location the location filter.
+     * @return the latest tweet filtered by location.
+     */
+    public List<Tweet> findLatestByLocation(String id, String location) {
+        //TODO
+        return null;
+    }
 
     /**
      * Return the latest tweet filtered by location.

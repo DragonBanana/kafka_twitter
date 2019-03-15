@@ -12,14 +12,18 @@ public class SubscriptionRoute {
 
     public static void configureRoutes() {
 
-        post("/subscription/:location/:user/:tag", (request, response) -> {
+        post("/subscription", (request, response) -> {
             response.type("application/json");
             String id = request.cookie("id");
+            /**
+             * body of the request containing the parameters to be followed
+             */
+            SubscriptionRequest sr = new Gson().fromJson(request.body(),SubscriptionRequest.class);
 
-            //TODO Check what char use as separator. Temporary char: &
-            List<String> locationToFollow = Arrays.asList(request.params(":location").split("&"));
-            List<String> userToFollow = Arrays.asList(request.params(":user").split("&"));
-            List<String> tagToFollow = Arrays.asList(request.params(":tag").split("&"));
+
+            Set<String> locationToFollow = sr.getLocations();
+            Set<String> userToFollow = sr.getFollowedUsers();
+            Set<String> tagToFollow = sr.getTags();
 
 
             //TODO Search for the user in the data structure
