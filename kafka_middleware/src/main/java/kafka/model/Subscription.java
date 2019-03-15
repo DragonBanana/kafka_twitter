@@ -47,9 +47,7 @@ public class Subscription {
         return tags.remove(tag);
     }
 
-    public Set<String> getFollowedUsers() {
-        return followedUsers;
-    }
+    public Set<String> getFollowedUsers() { return followedUsers; }
 
     public boolean addUser(String user) {
         return followedUsers.add(user);
@@ -59,9 +57,7 @@ public class Subscription {
         return followedUsers.remove(user);
     }
 
-    public Set<String> getLocations() {
-        return locations;
-    }
+    public Set<String> getLocations() { return locations; }
 
     public boolean addLocation(String location) {
         return locations.add(location);

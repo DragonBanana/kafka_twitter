@@ -3,7 +3,6 @@ package kafka.rest;
 import com.google.gson.Gson;
 import kafka.model.Tweet;
 
-import org.slf4j.LoggerFactory;
 
 import static spark.Spark.*;
 

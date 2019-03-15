@@ -44,4 +44,13 @@ public class SubscriptionStub {
         return location;
     }
 
+    public Long lastPoll(){
+        return subscription.getLastPoll();
+    }
+
+    public Long updatePoll(Long newPoll) {
+        subscription.setLastPoll(newPoll);
+        return newPoll;
+    }
+
 }
