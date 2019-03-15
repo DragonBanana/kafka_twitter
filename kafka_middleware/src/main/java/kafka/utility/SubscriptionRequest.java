@@ -1,4 +1,7 @@
-package kafka.rest;
+package kafka.utility;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class SubscriptionRequest{
     /**
@@ -27,4 +30,10 @@ public class SubscriptionRequest{
     public Set<String> getTags() {
         return tags;
     }
+
+    public void setTags(Set<String> tags) { this.tags = tags; }
+
+    public void setFollowedUsers(Set<String> followedUsers) { this.followedUsers = followedUsers; }
+
+    public void setLocations(Set<String> locations) { this.locations = locations; }
 }

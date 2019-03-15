@@ -1,5 +1,7 @@
 package kafka.model;
 
+import spark.Response;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
@@ -51,5 +53,16 @@ public class Twitter {
                 return user;
         }
         return null;
+    }
+
+    public boolean existUser(Response response, String id) {
+        User user = getUser(id);
+
+        if (user == null) {
+            response.status(404);
+            response.body("User does not exist");
+            return false;
+        }
+        return true;
     }
 }

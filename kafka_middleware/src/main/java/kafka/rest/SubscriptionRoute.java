@@ -1,10 +1,11 @@
 package kafka.rest;
 
+import com.google.gson.Gson;
 import kafka.model.Twitter;
 import kafka.model.User;
+import kafka.utility.SubscriptionRequest;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import static spark.Spark.*;
 
@@ -15,38 +16,34 @@ public class SubscriptionRoute {
         post("/subscription", (request, response) -> {
             response.type("application/json");
             String id = request.cookie("id");
-            /**
-             * body of the request containing the parameters to be followed
+
+            /*
+              body of the request containing the parameters to be followed
              */
-            SubscriptionRequest sr = new Gson().fromJson(request.body(),SubscriptionRequest.class);
+            SubscriptionRequest sr = new Gson().fromJson(request.body(), SubscriptionRequest.class);
 
 
             Set<String> locationToFollow = sr.getLocations();
             Set<String> userToFollow = sr.getFollowedUsers();
             Set<String> tagToFollow = sr.getTags();
 
+            Twitter twitter = Twitter.getTwitter();
 
-            //TODO Search for the user in the data structure
-            User user = Twitter.getTwitter().getUser(id);
+            //Search for the user in the data structure
+            if (twitter.existUser(response, id)) return null;
 
-            if (user == null) {
-                response.status(404);
-                response.body("User does not exist");
-                return null;
-            }
-
-            SubscriptionStub subscriptionStub = user.getSubscriptionStub();
+            SubscriptionStub subscriptionStub = twitter.getUser(id).getSubscriptionStub();
 
 
-            if (!locationToFollow.get(0).equals("*")) {
+            if (!locationToFollow.isEmpty()) {
                 locationToFollow.forEach(subscriptionStub::followLocation);
             }
 
-            if (!userToFollow.get(0).equals("*")) {
+            if (!userToFollow.isEmpty()) {
                 userToFollow.forEach(subscriptionStub::followUser);
             }
 
-            if (!tagToFollow.get(0).equals("*")) {
+            if (!tagToFollow.isEmpty()) {
                 tagToFollow.forEach(subscriptionStub::followTag);
             }
 

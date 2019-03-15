@@ -75,15 +75,4 @@ public class TweetStub {
         return null;
     }
 
-    /**
-     * Return the latest tweet filtered by location.
-     * @param id the identifier of the requester.
-     * @param location the location filter.
-     * @return the latest tweet filtered by location.
-     */
-    public List<Tweet> findLatestByLocation(String id, String location) {
-        //TODO
-        return null;
-    }
-
 }
