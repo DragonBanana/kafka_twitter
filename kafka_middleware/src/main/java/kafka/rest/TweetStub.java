@@ -56,23 +56,72 @@ public class TweetStub {
      * @param filters.
      * @return the latest tweet filtered using the filters param.
      */
-    //TODO choose how to save the filters.
-    //public List<Tweet> findTweets(String id,  f){
+    public List<Tweet> findTweets(String id, String filters){
         //TODO
-        //return null
-    //}
+        //taking out filters by locations, userFollowed and tags
+        String [] parts0 = filters.split("location=");
+        String [] parts1 = parts0[1].split("user=");
+        String [] parts2 = parts1[1].split("tags=");
+        String location = parts1[0];
+        String user = part2[0];
+        String tag = part2[1];
+        List<String> locationToFollow = Arrays.asList(location.split("&"));
+        List<String> userToFollow = Arrays.asList(user.split("&"));
+        List<String> tagToFollow = Arrays.asList(tag.split("&"));
+        if(!locationToFollow.isEmpty()){
+            return findLatestByLocation(id, locationToFollow, userToFollow, tagToFollow);
+        }
+        if(tagToFollow.isEmpty()){
+            return findLatestByUserFollowed(id, userToFollow);
+        }
+        else
+            return findLatestByTag(id, tagToFollow);
+        return null
+    }
 
 
 
     /**
      * Return the latest tweet filtered by location.
      * @param id the identifier of the requester.
-     * @param location the location filter.
+     * @param locations the location filters.
      * @return the latest tweet filtered by location.
      */
-    public List<Tweet> findLatestByLocation(String id, String location) {
+    public List<Tweet> findLatestByLocation(String id, List<String> locations, List<String> users, List<String> tags) {
+        //TODO search in location Topic, then filter result using users &/or tags
+        for (String loc: locations) {
+            Consumer<String, String> consumer = ConsumerFactory.getLocationTweetConsumer(id,loc);
+            consumer.subscribe(Arrays.asList("location"));
+            //TODO polling
+        }
+        if(!users.isEmpty()){
+            //TODO filter result using users filters
+        }
+        if(!tags.isEmpty()){
+            //TODO filter result using tags filters
+        }
+        return null;
+    }
+
+    /**
+     * Return the latest tweet filtered by userFollowed.
+     * @param id the identifier of the requester.
+     * @param users the user filters.
+     * @return the latest tweet filtered by user.
+     */
+    public List<Tweet> findLatestByUserFollowed(String id, List<String> users) {
         //TODO
         return null;
     }
 
+    /**
+     * Return the latest tweet filtered by tag.
+     * @param id the identifier of the requester.
+     * @param tags the tag filters.
+     * @return the latest tweet filtered by tag.
+     */
+    public List<Tweet> findLatestByTag(String id, List<String> tags) {
+        //TODO
+        return null;
+    }
 }
