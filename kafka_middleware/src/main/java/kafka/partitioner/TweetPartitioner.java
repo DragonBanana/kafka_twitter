@@ -1,5 +1,6 @@
 package kafka.partitioner;
 
+import com.google.gson.Gson;
 import kafka.model.Tweet;
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;
@@ -17,7 +18,8 @@ public class TweetPartitioner implements Partitioner {
         List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
         int numPartitions = partitions.size();
 
-        Tweet tweet = ((Tweet)value);
+        Tweet tweet = new Gson().fromJson((String) value, Tweet.class);
+
         String author = tweet.getAuthor();
         int hashAuthor = author.hashCode();
         if(topic.equals("location")){

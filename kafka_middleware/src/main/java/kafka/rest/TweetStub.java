@@ -33,20 +33,43 @@ import java.util.stream.Collectors;
 
 public class TweetStub {
 
+
+    public static void main(String[] args) {
+        TweetStub tweetStub = new TweetStub();
+        List<String> tags = new ArrayList<>();
+        List<String> mentions = new ArrayList<>();
+        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
+    }
+
     /**
      * Save the tweet.
      * @param tweet the tweet that has to be saved.
      * @return the tweet that has been saved.
      */
+
     public Tweet save(Tweet tweet) {
 
-        //Creating producer and producer record
+        //Creating producer
         Producer<String, String> producer = ProducerFactory.getTweetProducer();
-        ProducerRecord record = new ProducerRecord<>("tweet", tweet.getAuthor(), new Gson().toJson(tweet, Tweet.class));
 
+        //Get the filters used in the tweet.
+        List<String> tweetFilters = tweet.getFilters();
+        List<ProducerRecord<String, String>> records = new ArrayList<>();
+
+
+        //Check where the tweet must be saved
+        for (String filter : tweetFilters)
+            records.add(new ProducerRecord<>(filter,
+                    new Gson().toJson(tweet, Tweet.class)));
+
+        System.out.println(tweetFilters);
+        System.out.println(records);
         //Send data to Kafka
-        producer.send(record);
-        producer.flush();
+        records.forEach(producerRecord -> {
+            producer.send(producerRecord);
+            producer.flush();
+        });
+
         producer.close();
         return tweet;
 

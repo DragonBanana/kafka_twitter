@@ -1,5 +1,6 @@
 package kafka.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tweet {
@@ -20,7 +21,7 @@ public class Tweet {
     private String timestamp;
 
     /**
-     * The location of the tweet.
+     * The location of the tweet and it is supposed to be unique in a tweet
      */
     private String location;
 
@@ -98,5 +99,24 @@ public class Tweet {
      */
     public List<String> getMentions() {
         return mentions;
+    }
+
+    /**
+     * Return the filters type used in the tweet.
+     * All possible values are : location, tag, mention.
+     * @return The list containig the filter type
+     */
+    public List<String> getFilters() {
+        List<String> result = new ArrayList<>();
+
+        if (mentions.size() > 0)
+            result.add("mention");
+
+        if (tags.size() > 0)
+            result.add("tag");
+
+        result.add("location");
+
+        return result;
     }
 }
