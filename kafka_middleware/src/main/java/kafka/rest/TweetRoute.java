@@ -26,7 +26,7 @@ public class TweetRoute {
             return "Tweet created" + new Gson().toJson(tweet);
         });
 
-        get("/tweets/{filter}/latest",(request, response) -> {
+        get("/tweets/*/latest",(request, response) -> {
 
             String id = request.cookie("id");
             //Search for the user in the data structure
@@ -34,9 +34,9 @@ public class TweetRoute {
             response.type("application/json");
             response.status(200);
 
-            //TODO how to save the filter from the request
-            //should we create a class o just a collection?
-            //new TweetStub().findTweets(id,filter);
+            String filters = request.splat()[0];
+            //TODO check error in filters
+            new TweetStub().findTweets(id,filters);
             return null;
         });
     }
