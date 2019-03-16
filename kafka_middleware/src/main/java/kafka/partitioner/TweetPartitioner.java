@@ -1,9 +1,11 @@
 package kafka.partitioner;
 
+import kafka.model.Tweet;
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;
 import org.apache.kafka.common.PartitionInfo;
 
+import java.util.List;
 import java.util.Map;
 
 public class TweetPartitioner implements Partitioner {
@@ -25,7 +27,7 @@ public class TweetPartitioner implements Partitioner {
         }
         if(topic.equals("mention")){
             if (tweet.getMentions().size() == 1){
-                String mention = tweet.getMentions()[0];
+                String mention = tweet.getMentions().get(0);
                 int hashMention = mention.hashCode();
                 return (hashAuthor + hashMention)%(numPartitions-1);
             }
@@ -33,7 +35,7 @@ public class TweetPartitioner implements Partitioner {
         }
         if(topic.equals("tag")){
             if (tweet.getTags().size() == 1){
-                String tag = tweet.getTags()[0];
+                String tag = tweet.getTags().get(0);
                 int hashTag = tag.hashCode();
                 return (hashAuthor + hashTag)%(numPartitions-1);
             }

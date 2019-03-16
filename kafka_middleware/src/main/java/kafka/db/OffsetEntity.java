@@ -9,6 +9,7 @@ public class OffsetEntity extends TableServiceEntity {
 
     private String user;
     private String filter;
+    private int topicPartition;
     private Long offset;
 
     public OffsetEntity() {
@@ -17,9 +18,10 @@ public class OffsetEntity extends TableServiceEntity {
 
     public OffsetEntity(Offset offset) {
         this.partitionKey = offset.getKey().getUser();
-        this.rowKey = offset.getKey().getFilter();
+        this.rowKey = offset.getKey().getUser()+offset.getKey().getTopicPartition();
         this.user = offset.getKey().getUser();
         this.filter = offset.getKey().getFilter();
+        this.topicPartition = offset.getKey().getTopicPartition();
         this.offset = offset.getValue().getOffset();
     }
 
@@ -48,6 +50,6 @@ public class OffsetEntity extends TableServiceEntity {
     }
 
     public Offset asOffset() {
-        return new Offset(new OffsetKey(user, filter), new OffsetValue(offset));
+        return new Offset(new OffsetKey(user, filter, topicPartition), new OffsetValue(offset));
     }
 }

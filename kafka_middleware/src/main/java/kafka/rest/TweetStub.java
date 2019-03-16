@@ -2,9 +2,13 @@ package kafka.rest;
 
 import com.google.gson.Gson;
 import kafka.conf.ConsumerConfiguration;
+import kafka.db.AzureDBConn;
+import kafka.model.Offset;
+import kafka.model.OffsetKey;
 import kafka.utility.ConsumerFactory;
 import kafka.utility.ProducerFactory;
 import kafka.model.Tweet;
+import kafka.utility.TopicPartitionFactory;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
@@ -13,10 +17,7 @@ import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class TweetStub {
 
@@ -78,6 +80,44 @@ public class TweetStub {
             return findLatestByTag(id, tagToFollow);
     }
 
+    /**
+     * Return the latest tweet filtered by location.
+     * @param id the identifier of the requester.
+     * @param location the location.
+     * @return the latest tweet filtered by location.
+     */
+    public List<Tweet> findLatestByLocation(String id, String location, String filter) {
+        try {
+            //The topic we are reading from.
+            String topic = "location";
+            //Getting the consumere.
+            Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+            //Subscribe to a topic.
+            consumer.subscribe(Arrays.asList(topic));
+            //Getting the partition of the topic.
+            int partition = TopicPartitionFactory.getLocationPartition(location);
+            //Creating the topic partition object (it is required in the next instructions).
+            TopicPartition topicPartition = new TopicPartition(topic, partition);
+            //Getting the offset from the db.
+            long offset = new AzureDBConn().get(new OffsetKey(id, filter, partition)).getValue().getOffset();
+            //Moving the offset.
+            consumer.seek(topicPartition, offset);
+            consumer.poll(0);
+            //Polling the data.
+            ConsumerRecords<String,String> records = consumer.poll(100);
+            //Transforming data and filtering. (!Only by location)
+            List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
+            //Getting the new offset.
+            offset = consumer.position(topicPartition);
+            //Saving the new offset for EOS.
+            new AzureDBConn().put(new Offset(id, filter, partition, offset));
+            //Returning the data.
+            return tweets;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     /**
@@ -89,8 +129,9 @@ public class TweetStub {
     public List<Tweet> findLatestByLocation(String id, List<String> locations, List<String> users, List<String> tags) {
         //TODO search in location Topic, then filter result using users &/or tags
         for (String loc: locations) {
-            Consumer<String, String> consumer = ConsumerFactory.getLocationTweetConsumer(id,loc);
-            consumer.subscribe(Arrays.asList("location"));
+            //Consumer<String, String> consumer = ConsumerFactory.getConsumer(id,loc);
+            //int partition = TopicPartitionFactory.getLocationPartition(loc);
+            //consumer.subscribe(Arrays.asList("location"));
             //TODO polling
         }
         if(!users.isEmpty()){

@@ -1,5 +1,8 @@
  package kafka.utility;
 
+import kafka.model.Offset;
+import kafka.model.OffsetKey;
+import kafka.rest.OffsetStub;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
@@ -8,12 +11,11 @@ import java.util.Properties;
 public class ConsumerFactory {
 
     /**
-     * Return the consumer for location topic.
-     * @return the consumer for location topic.
+     * Return the consumer topic.
+     * @return the consumer topic.
      */
-    public static Consumer getLocationTweetConsumer(String user, String location) {
-        //TODO
-        return null;
+    public static Consumer<String, String> getConsumer() {
+        return new KafkaConsumer(getDefaultProperty());
     }
 
     /**
