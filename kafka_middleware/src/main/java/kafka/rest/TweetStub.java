@@ -53,7 +53,7 @@ public class TweetStub {
     /**
      * Main function for searching tweets given the filters.
      * @param id of requester.
-     * @param filters.
+     * @param filters .
      * @return the latest tweet filtered using the filters param.
      */
     public List<Tweet> findTweets(String id, String filters){
@@ -63,8 +63,8 @@ public class TweetStub {
         String [] parts1 = parts0[1].split("user=");
         String [] parts2 = parts1[1].split("tags=");
         String location = parts1[0];
-        String user = part2[0];
-        String tag = part2[1];
+        String user = parts2[0];
+        String tag = parts2[1];
         List<String> locationToFollow = Arrays.asList(location.split("&"));
         List<String> userToFollow = Arrays.asList(user.split("&"));
         List<String> tagToFollow = Arrays.asList(tag.split("&"));
@@ -76,7 +76,6 @@ public class TweetStub {
         }
         else
             return findLatestByTag(id, tagToFollow);
-        return null
     }
 
 
