@@ -37,7 +37,9 @@ public class TweetStub {
     public static void main(String[] args) {
         TweetStub tweetStub = new TweetStub();
         List<String> tags = new ArrayList<>();
+        tags.add("#swag");
         List<String> mentions = new ArrayList<>();
+        mentions.add("@bellofigo");
         tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
     }
 
@@ -56,20 +58,19 @@ public class TweetStub {
         List<String> tweetFilters = tweet.getFilters();
         List<ProducerRecord<String, String>> records = new ArrayList<>();
 
-
         //Check where the tweet must be saved
-        for (String filter : tweetFilters)
-            records.add(new ProducerRecord<>(filter,
+        for (String filter : tweetFilters) {
+            records.add(new ProducerRecord<>(filter, tweet.getLocation(),
                     new Gson().toJson(tweet, Tweet.class)));
-
+        }
         System.out.println(tweetFilters);
         System.out.println(records);
         //Send data to Kafka
         records.forEach(producerRecord -> {
             producer.send(producerRecord);
-            producer.flush();
         });
 
+        producer.flush();
         producer.close();
         return tweet;
 

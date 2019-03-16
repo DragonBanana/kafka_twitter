@@ -110,12 +110,12 @@ public class Tweet {
         List<String> result = new ArrayList<>();
 
         if (mentions.size() > 0)
-            result.add("mention");
+            result.add(Topic.MENTION);
 
         if (tags.size() > 0)
-            result.add("tag");
+            result.add(Topic.TAG);
 
-        result.add("location");
+        result.add(Topic.LOCATION);
 
         return result;
     }
