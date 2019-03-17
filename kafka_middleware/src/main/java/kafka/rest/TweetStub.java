@@ -5,6 +5,7 @@ import kafka.conf.ConsumerConfiguration;
 import kafka.db.AzureDBConn;
 import kafka.model.Offset;
 import kafka.model.OffsetKey;
+import kafka.model.Topic;
 import kafka.utility.ConsumerFactory;
 import kafka.utility.ProducerFactory;
 import kafka.model.Tweet;
@@ -38,11 +39,15 @@ public class TweetStub {
         TweetStub tweetStub = new TweetStub();
         List<String> tags = new ArrayList<>();
         tags.add("#swag");
+        List<String> tags1 = new ArrayList<>();
+        tags1.add("#swag");
+        tags1.add("#swag2");
         List<String> mentions = new ArrayList<>();
         mentions.add("@bellofigo");
         tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
         tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
-        tweetStub.findLatestByLocation("luca", "verona", "nofilters").stream().forEach(t -> System.out.println(new Gson().toJson(t)));
+        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
+        tweetStub.findLatestByTag("luca", Arrays.asList("#swag"), "nofilters").stream().forEach(t -> System.out.println(new Gson().toJson(t)));
     }
 
     /**
@@ -113,36 +118,83 @@ public class TweetStub {
      * @return the latest tweet filtered by location.
      */
     public List<Tweet> findLatestByLocation(String id, String location, String filter) {
-        try {
-            //The topic we are reading from.
-            String topic = "location";
-            //Getting the consumere.
-            Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        //The topic we are reading from.
+        String topic = Topic.LOCATION;
+        //Getting the consumere.
+        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        //Getting the partition of the topic.
+        int partition = TopicPartitionFactory.getLocationPartition(location);
+        //Creating the topic partition object (it is required in the next instructions).
+        TopicPartition topicPartition = new TopicPartition(topic, partition);
+        //Subscribe to a topic.
+        consumer.assign(Arrays.asList(topicPartition));
+        //Getting the offset from the db.
+        long offset = new AzureDBConn().get(new OffsetKey(id, filter, partition)).getValue().getOffset();
+        //Moving the offset.
+        consumer.seek(topicPartition, offset);
+        consumer.poll(0);
+        //Polling the data.
+        ConsumerRecords<String,String> records = consumer.poll(100);
+        //Transforming data and filtering. (!Only by location)
+        List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
+        //Getting the new offset.
+        offset = consumer.position(topicPartition);
+        //Saving the new offset for EOS.
+        new AzureDBConn().put(new Offset(id, filter, partition, offset));
+        //Returning the data.
+        return tweets;
+    }
+
+    /**
+     * Return the latest tweet filtered by tags.
+     * @param id the identifier of the requester.
+     * @param tags the list of tags.
+     * @return the latest tweet filtered by tags.
+     */
+    public List<Tweet> findLatestByTag(String id, List<String> tags, String filter) {
+        //The topic we are reading from.
+        String topic = Topic.TAG;
+        //Getting the consumere.
+        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        //Declaring two partitions: the first for 1 tag search, the secondo for blob search.
+        List<TopicPartition> topicPartitions = new ArrayList<>();
+        if(tags.size() == 1) {
             //Getting the partition of the topic.
-            int partition = TopicPartitionFactory.getLocationPartition(location);
+            int partition = TopicPartitionFactory.getTagPartition(tags.get(0));
             //Creating the topic partition object (it is required in the next instructions).
-            TopicPartition topicPartition = new TopicPartition(topic, partition);
-            //Subscribe to a topic.
-            consumer.assign(Arrays.asList(topicPartition));
-            //Getting the offset from the db.
-            long offset = new AzureDBConn().get(new OffsetKey(id, filter, partition)).getValue().getOffset();
-            //Moving the offset.
-            consumer.seek(topicPartition, offset);
-            consumer.poll(0);
-            //Polling the data.
-            ConsumerRecords<String,String> records = consumer.poll(100);
-            //Transforming data and filtering. (!Only by location)
-            List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
-            //Getting the new offset.
-            offset = consumer.position(topicPartition);
-            //Saving the new offset for EOS.
-            new AzureDBConn().put(new Offset(id, filter, partition, offset));
-            //Returning the data.
-            return tweets;
-        } catch (Exception e) {
-            e.printStackTrace();
+            topicPartitions.add(new TopicPartition(topic, partition));
         }
-        return null;
+        //Getting the partition of the topic.
+        int partition = TopicPartitionFactory.TAG_PARTITION_BLOB;
+        //Creating the topic partition object (it is required in the next instructions).
+        topicPartitions.add(new TopicPartition(topic, partition));
+        //Subscribe to a topic.
+        consumer.assign(topicPartitions);
+        topicPartitions.stream()
+                .forEach(topicPartition -> {
+                    //Getting the offset from the db.
+                    long offset = new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset();
+                    //Moving the offset.
+                    consumer.seek(topicPartition, offset);
+                });
+        //Polling the data.
+        ConsumerRecords<String,String> records = consumer.poll(1000);
+        //Transforming data and filtering. (!Only by tag)
+        List<Tweet> tweets = new ArrayList();
+        records.forEach(record -> {
+            Tweet t = new Gson().fromJson(record.value(), Tweet.class);
+            if(t.getTags().containsAll(tags))
+                tweets.add(t);
+        });
+        topicPartitions.forEach(topicPartition -> {
+            //Getting the new offset.
+            long offset = consumer.position(topicPartition);
+            //Saving the new offset for EOS.
+            new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), offset));
+
+        });
+        //Returning the data
+        return tweets;
     }
 
 
