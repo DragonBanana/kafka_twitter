@@ -34,7 +34,8 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.43.137:9092");
+        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.43.137:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "5000");

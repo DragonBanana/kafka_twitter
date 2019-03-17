@@ -15,7 +15,8 @@ public class ConsumerFactory {
      * @return the consumer topic.
      */
     public static Consumer<String, String> getConsumer() {
-        return new KafkaConsumer(getDefaultProperty());
+        System.out.println("SWAG SWAG");
+        return new KafkaConsumer (getDefaultProperty());
     }
 
     /**
@@ -27,8 +28,9 @@ public class ConsumerFactory {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");
+        props.put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-client");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, "false");
         return props;
     }
 

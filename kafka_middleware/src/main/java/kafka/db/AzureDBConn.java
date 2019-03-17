@@ -32,9 +32,9 @@ public class AzureDBConn {
         CloudTableClient tableClient = storageAccount.createCloudTableClient();
         // Create a cloud table object for the table.
         CloudTable cloudTable = tableClient.getTableReference(tableName);
-        // Create a new customer entity.
+        // Create a new offset entity.
         OffsetEntity o = new OffsetEntity(offset);
-        // Create an operation to add the new customer to the people table.
+        // Create an operation to add the new offset to the offset table.
         TableOperation insertCustomer1 = TableOperation.insertOrReplace(o);
         // Submit the operation to the table service.
         cloudTable.execute(insertCustomer1);
@@ -59,6 +59,9 @@ public class AzureDBConn {
         // Submit the operation to the table service and get the specific entity.
         OffsetEntity entity =
                 cloudTable.execute(tableOperation).getResultAsType();
+        if(entity == null) {
+            entity = new OffsetEntity(new Offset(key, new OffsetValue(0)));
+        }
         return entity.asOffset();
     }
 

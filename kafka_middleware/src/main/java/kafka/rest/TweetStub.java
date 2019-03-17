@@ -41,6 +41,8 @@ public class TweetStub {
         List<String> mentions = new ArrayList<>();
         mentions.add("@bellofigo");
         tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
+        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
+        tweetStub.findLatestByLocation("luca", "verona", "nofilters").stream().forEach(t -> System.out.println(new Gson().toJson(t)));
     }
 
     /**
@@ -116,12 +118,12 @@ public class TweetStub {
             String topic = "location";
             //Getting the consumere.
             Consumer<String, String> consumer = ConsumerFactory.getConsumer();
-            //Subscribe to a topic.
-            consumer.subscribe(Arrays.asList(topic));
             //Getting the partition of the topic.
             int partition = TopicPartitionFactory.getLocationPartition(location);
             //Creating the topic partition object (it is required in the next instructions).
             TopicPartition topicPartition = new TopicPartition(topic, partition);
+            //Subscribe to a topic.
+            consumer.assign(Arrays.asList(topicPartition));
             //Getting the offset from the db.
             long offset = new AzureDBConn().get(new OffsetKey(id, filter, partition)).getValue().getOffset();
             //Moving the offset.

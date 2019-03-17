@@ -7,7 +7,7 @@ public class TopicPartitionFactory {
     /**
      * The number of partitions in 'location' topic.
      */
-    public static final int LOCATION_PARTITIONS = 666;
+    public static final int LOCATION_PARTITIONS = 60;
 
     /**
      * Return the partition of the location topic given a string.
@@ -15,7 +15,7 @@ public class TopicPartitionFactory {
      * @return the partition of the location.
      */
     public static int getLocationPartition(String location) {
-        return location.hashCode() % TopicPartitionFactory.LOCATION_PARTITIONS;
+        return Math.abs(location.hashCode()) % TopicPartitionFactory.LOCATION_PARTITIONS;
     }
 
 }
