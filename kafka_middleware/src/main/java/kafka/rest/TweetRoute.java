@@ -26,7 +26,7 @@ public class TweetRoute {
             return "Tweet created" + new Gson().toJson(tweet);
         });
 
-        get("/tweets/*/latest",(request, response) -> {
+        get("/tweets/*/*/*/latest",(request, response) -> {
 
             String id = request.cookie("id");
             //Search for the user in the data structure
@@ -34,10 +34,12 @@ public class TweetRoute {
             response.type("application/json");
             response.status(200);
 
-            String filters = request.splat()[0];
+            String locations = request.splat()[0];
+            String tags = request.splat()[1];
+            String mentions = request.splat()[2];
+
             //TODO check error in filters
-            new TweetStub().findTweets(id,filters);
-            return null;
+            return new TweetStub().findTweets(id, locations, tags, mentions);
         });
     }
 }

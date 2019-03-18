@@ -22,12 +22,12 @@ public class TweetPartitioner implements Partitioner {
 
         String author = tweet.getAuthor();
         int hashAuthor = author.hashCode();
-        if(topic.equals("location")){
+        if(topic.equals(Topic.LOCATION)){
             String location = tweet.getLocation();
             int hashLocation = location.hashCode();
             return (Math.abs(hashLocation)) % (numPartitions);
         }
-        if(topic.equals("mention")){
+        if(topic.equals(Topic.MENTION)){
             if (tweet.getMentions().size() == 1){
                 String mention = tweet.getMentions().get(0);
                 int hashMention = mention.hashCode();
@@ -35,7 +35,7 @@ public class TweetPartitioner implements Partitioner {
             }
             return numPartitions;
         }
-        if(topic.equals("tag")){
+        if(topic.equals(Topic.TAG)){
             if (tweet.getTags().size() == 1){
                 String tag = tweet.getTags().get(0);
                 int hashTag = tag.hashCode();

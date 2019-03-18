@@ -86,41 +86,75 @@ public class TweetStub {
     /**
      * Main function for searching tweets given the filters.
      * @param id of requester.
-     * @param filters .
-     * @return the latest tweet filtered using the filters param.
+     * @param locationFilters location filters.
+     * @param tagFilters tag filters.
+     * @param mentionFilters mention filters.
+     * @return the latest tweet filtered using the filters params.
      */
-    public List<Tweet> findTweets(String id, String filters){
+    public List<Tweet> findTweets(String id, String locationFilters, String tagFilters, String mentionFilters){
         //TODO
         //taking out filters by locations, userFollowed and tags
-        String [] parts0 = filters.split("location=");
-        String [] parts1 = parts0[1].split("user=");
-        String [] parts2 = parts1[1].split("tags=");
-        String location = parts1[0];
-        String user = parts2[0];
-        String tag = parts2[1];
-        List<String> locationToFollow = Arrays.asList(location.split("&"));
-        List<String> userToFollow = Arrays.asList(user.split("&"));
-        List<String> tagToFollow = Arrays.asList(tag.split("&"));
+        List<String> locationToFollow = Arrays.asList(locationFilters.split("&"));
+        List<String> userToFollow = Arrays.asList(mentionFilters.split("&"));
+        List<String> tagToFollow = Arrays.asList(tagFilters.split("&"));
+        String filter = locationFilters + tagFilters + mentionFilters;
+
         if(!locationToFollow.isEmpty()){
-            return findLatestByLocation(id, locationToFollow, userToFollow, tagToFollow);
+            return filterByLocation(id, locationToFollow, userToFollow, tagToFollow, filter);
         }
-        if(tagToFollow.isEmpty()){
-            return findLatestByUserFollowed(id, userToFollow);
+        if(userToFollow.isEmpty()){
+            //filter tweet using only tag.
+            return findLatestByTag(id, tagToFollow, filter);
+
         }
         else
-            return findLatestByTag(id, tagToFollow);
+            //filter tweet using users mentioned (and tag if present).
+            return findLatestByMention(id, userToFollow, tagToFollow, filter);
+    }
+
+
+    /**
+     * Return the latest tweet filtered by location.
+     * @param id the identifier of the requester.
+     * @param locations the location filters.
+     * @param users the user mentioned filters.
+     * @param tagss the tag filters.
+     * @param filter the filters for the research.
+     * @return the latest tweet filtered by location.
+     */
+    public List<Tweet> filterByLocation(String id, List<String> locations, List<String> users, List<String> tags, String filter) {
+        //search in Topic.LOCATION, then filter result using users mentioned &/or tags.
+        List<Tweet> tweets = new ArrayList<>();
+        for (String loc: locations) {
+            tweets.add(findLatestByLocation(id, loc, filter));
+        }
+
+        if(!users.isEmpty()){
+            //filter result using users mentioned filter.
+            tweets = tweets.stream()
+                    .filter(tweet -> (tweet.getMentions()).containsAll(users))
+                    .collect(Collectors.toList());
+        }
+        if(!tags.isEmpty()){
+            //filter result using tags filter.
+            tweets = tweets.stream()
+                    .filter(tweet -> (tweet.getTags()).containsAll(tags))
+                    .collect(Collectors.toList());
+        }
+        return tweets;
     }
 
     /**
      * Return the latest tweet filtered by location.
      * @param id the identifier of the requester.
      * @param location the location.
+     * @param filter the filters for the research.
      * @return the latest tweet filtered by location.
      */
     public List<Tweet> findLatestByLocation(String id, String location, String filter) {
         //The topic we are reading from.
         String topic = Topic.LOCATION;
-        //Getting the consumere.
+        //Getting the consumer.
         Consumer<String, String> consumer = ConsumerFactory.getConsumer();
         //Getting the partition of the topic.
         int partition = TopicPartitionFactory.getLocationPartition(location);
@@ -149,14 +183,15 @@ public class TweetStub {
      * Return the latest tweet filtered by tags.
      * @param id the identifier of the requester.
      * @param tags the list of tags.
+     * @param filter the filters for the research.
      * @return the latest tweet filtered by tags.
      */
     public List<Tweet> findLatestByTag(String id, List<String> tags, String filter) {
         //The topic we are reading from.
         String topic = Topic.TAG;
-        //Getting the consumere.
+        //Getting the consumer.
         Consumer<String, String> consumer = ConsumerFactory.getConsumer();
-        //Declaring two partitions: the first for 1 tag search, the secondo for blob search.
+        //Declaring two partitions: the first for 1 tag search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
         if(tags.size() == 1) {
             //Getting the partition of the topic.
@@ -197,49 +232,67 @@ public class TweetStub {
         return tweets;
     }
 
-
     /**
-     * Return the latest tweet filtered by location.
+     * Return the latest tweet filtered by Mention.
      * @param id the identifier of the requester.
-     * @param locations the location filters.
-     * @return the latest tweet filtered by location.
-     */
-    public List<Tweet> findLatestByLocation(String id, List<String> locations, List<String> users, List<String> tags) {
-        //TODO search in location Topic, then filter result using users &/or tags
-        for (String loc: locations) {
-            //Consumer<String, String> consumer = ConsumerFactory.getConsumer(id,loc);
-            //int partition = TopicPartitionFactory.getLocationPartition(loc);
-            //consumer.subscribe(Arrays.asList("location"));
-            //TODO polling
-        }
-        if(!users.isEmpty()){
-            //TODO filter result using users filters
-        }
-        if(!tags.isEmpty()){
-            //TODO filter result using tags filters
-        }
-        return null;
-    }
-
-    /**
-     * Return the latest tweet filtered by userFollowed.
-     * @param id the identifier of the requester.
-     * @param users the user filters.
+     * @param mentions the user mentioned filters.
+     * @param tags the tag filters.
+     * @param filter the filters for the research.
      * @return the latest tweet filtered by user.
      */
-    public List<Tweet> findLatestByUserFollowed(String id, List<String> users) {
-        //TODO
-        return null;
+    public List<Tweet> findLatestByMention(String id, List<String> mentions, List<String> tags, String filter) {
+
+        //The topic we are reading from.
+        String topic = Topic.MENTION;
+        //Getting the consumer.
+        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        //Declaring two partitions: the first for 1 mention search, the second for blob search.
+        List<TopicPartition> topicPartitions = new ArrayList<>();
+        if(mentions.size() == 1) {
+            //Getting the partition of the topic.
+            int partition = TopicPartitionFactory.getMentionPartition(mentions.get(0));
+            //Creating the topic partition object (it is required in the next instructions).
+            topicPartitions.add(new TopicPartition(topic, partition));
+        }
+        //Getting the partition of the topic.
+        int partition = TopicPartitionFactory.MENTION_PARTITION_BLOB;
+        //Creating the topic partition object (it is required in the next instructions).
+        topicPartitions.add(new TopicPartition(topic, partition));
+        //Subscribe to a topic.
+        consumer.assign(topicPartitions);
+        topicPartitions.stream()
+                .forEach(topicPartition -> {
+                    //Getting the offset from the db.
+                    long offset = new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset();
+                    //Moving the offset.
+                    consumer.seek(topicPartition, offset);
+                });
+        //Polling the data.
+        ConsumerRecords<String,String> records = consumer.poll(1000);
+        //Transforming data and filtering. (!Only by mention)
+        List<Tweet> tweets = new ArrayList();
+        records.forEach(record -> {
+            Tweet t = new Gson().fromJson(record.value(), Tweet.class);
+            if(t.getMentions().containsAll(mentions))
+                tweets.add(t);
+        });
+        topicPartitions.forEach(topicPartition -> {
+            //Getting the new offset.
+            long offset = consumer.position(topicPartition);
+            //Saving the new offset for EOS.
+            new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), offset));
+
+        });
+        if(tags.isEmpty())
+            //Returning the data
+            return tweets;
+
+        //filter result using tags filter.
+        tweets = tweets.stream()
+                .filter(tweet -> (tweet.getTags()).containsAll(tags))
+                .collect(Collectors.toList());
+        return tweets;
     }
 
-    /**
-     * Return the latest tweet filtered by tag.
-     * @param id the identifier of the requester.
-     * @param tags the tag filters.
-     * @return the latest tweet filtered by tag.
-     */
-    public List<Tweet> findLatestByTag(String id, List<String> tags) {
-        //TODO
-        return null;
-    }
+
 }
