@@ -1,8 +1,5 @@
  package kafka.utility;
 
-import kafka.model.Offset;
-import kafka.model.OffsetKey;
-import kafka.rest.OffsetStub;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
@@ -16,7 +13,7 @@ public class ConsumerFactory {
      */
     public static Consumer<String, String> getConsumer() {
         System.out.println("SWAG SWAG");
-        return new KafkaConsumer (getDefaultProperty());
+        return new KafkaConsumer<>(getDefaultProperty());
     }
 
     /**
@@ -25,7 +22,8 @@ public class ConsumerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.94:9092");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");
