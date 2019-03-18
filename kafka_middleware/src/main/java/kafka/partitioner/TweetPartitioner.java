@@ -1,6 +1,7 @@
 package kafka.partitioner;
 
 import com.google.gson.Gson;
+import kafka.model.Topic;
 import kafka.model.Tweet;
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;

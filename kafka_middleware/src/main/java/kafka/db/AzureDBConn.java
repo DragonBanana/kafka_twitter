@@ -22,47 +22,53 @@ public class AzureDBConn {
     /**
      * Save an offset in the Azure Table.
      * @param offset the offset to be saved.
-     * @throws Exception when it is not possible to connect to Azure Table Storage.
-     */
-    public void put(Offset offset) throws Exception{
-        // Retrieve storage account from connection-string.
-        CloudStorageAccount storageAccount =
-                CloudStorageAccount.parse(storageConnectionString);
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.createCloudTableClient();
-        // Create a cloud table object for the table.
-        CloudTable cloudTable = tableClient.getTableReference(tableName);
-        // Create a new offset entity.
-        OffsetEntity o = new OffsetEntity(offset);
-        // Create an operation to add the new offset to the offset table.
-        TableOperation insertCustomer1 = TableOperation.insertOrReplace(o);
-        // Submit the operation to the table service.
-        cloudTable.execute(insertCustomer1);
+     * */
+    public void put(Offset offset){
+        try {
+            // Retrieve storage account from connection-string.
+            CloudStorageAccount storageAccount =
+                    CloudStorageAccount.parse(storageConnectionString);
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.createCloudTableClient();
+            // Create a cloud table object for the table.
+            CloudTable cloudTable = tableClient.getTableReference(tableName);
+            // Create a new offset entity.
+            OffsetEntity o = new OffsetEntity(offset);
+            // Create an operation to add the new offset to the offset table.
+            TableOperation insertCustomer1 = TableOperation.insertOrReplace(o);
+            // Submit the operation to the table service.
+            cloudTable.execute(insertCustomer1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Retrieve an offset in the Azure Table.
      * @param key the key of the offset that has to be retrieved.
-     * @throws Exception when it is not possible to connect to Azure Table Storage.
      */
-    public Offset get(OffsetKey key) throws Exception{
-        // Retrieve storage account from connection-string.
-        CloudStorageAccount storageAccount =
-                CloudStorageAccount.parse(storageConnectionString);
-        // Create the table client.
-        CloudTableClient tableClient = storageAccount.createCloudTableClient();
-        // Create a cloud table object for the table.
-        CloudTable cloudTable = tableClient.getTableReference(tableName);
-        // Create a cloud table object for the table.
-        TableOperation tableOperation =
-                TableOperation.retrieve(key.getUser(), key.getUser() + key.getTopicPartition(), OffsetEntity.class);
-        // Submit the operation to the table service and get the specific entity.
-        OffsetEntity entity =
-                cloudTable.execute(tableOperation).getResultAsType();
-        if(entity == null) {
-            entity = new OffsetEntity(new Offset(key, new OffsetValue(0)));
+    public Offset get(OffsetKey key){
+        try {
+            // Retrieve storage account from connection-string.
+            CloudStorageAccount storageAccount =
+                    CloudStorageAccount.parse(storageConnectionString);
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.createCloudTableClient();
+            // Create a cloud table object for the table.
+            CloudTable cloudTable = tableClient.getTableReference(tableName);
+            // Create a cloud table object for the table.
+            TableOperation tableOperation =
+                    TableOperation.retrieve(key.getUser(), key.getUser() + key.getTopicPartition(), OffsetEntity.class);
+            // Submit the operation to the table service and get the specific entity.
+            OffsetEntity entity = cloudTable.execute(tableOperation).getResultAsType();
+            if(entity == null) {
+                entity = new OffsetEntity(new Offset(key, new OffsetValue(0)));
+            }
+            return entity.asOffset();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return entity.asOffset();
+        return null;
     }
 
     //TODO

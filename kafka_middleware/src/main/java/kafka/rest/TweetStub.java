@@ -118,7 +118,7 @@ public class TweetStub {
      * @param id the identifier of the requester.
      * @param locations the location filters.
      * @param users the user mentioned filters.
-     * @param tagss the tag filters.
+     * @param tags the tag filters.
      * @param filter the filters for the research.
      * @return the latest tweet filtered by location.
      */
@@ -126,7 +126,7 @@ public class TweetStub {
         //search in Topic.LOCATION, then filter result using users mentioned &/or tags.
         List<Tweet> tweets = new ArrayList<>();
         for (String loc: locations) {
-            tweets.add(findLatestByLocation(id, loc, filter));
+            tweets.addAll(findLatestByLocation(id, loc, filter));
         }
 
         if(!users.isEmpty()){
@@ -270,7 +270,7 @@ public class TweetStub {
         //Polling the data.
         ConsumerRecords<String,String> records = consumer.poll(1000);
         //Transforming data and filtering. (!Only by mention)
-        List<Tweet> tweets = new ArrayList();
+        final List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
             Tweet t = new Gson().fromJson(record.value(), Tweet.class);
             if(t.getMentions().containsAll(mentions))
@@ -288,10 +288,10 @@ public class TweetStub {
             return tweets;
 
         //filter result using tags filter.
-        tweets = tweets.stream()
+        List <Tweet> ts = tweets.stream()
                 .filter(tweet -> (tweet.getTags()).containsAll(tags))
                 .collect(Collectors.toList());
-        return tweets;
+        return ts;
     }
 
 
