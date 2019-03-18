@@ -21,15 +21,13 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.ProducerFencedException;
 
-import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class TweetStub {
@@ -72,10 +70,20 @@ public class TweetStub {
         }
         System.out.println(tweetFilters);
         System.out.println(records);
+
         //Send data to Kafka
-        records.forEach(producerRecord -> {
-            producer.send(producerRecord);
-        });
+
+        producer.initTransactions();
+        try {
+            producer.beginTransaction();
+            records.forEach(producer::send);
+            producer.commitTransaction();
+        } catch (ProducerFencedException e) {
+            producer.close();
+        } catch (KafkaException e) {
+            producer.abortTransaction();
+        }
+
 
         producer.flush();
         producer.close();
