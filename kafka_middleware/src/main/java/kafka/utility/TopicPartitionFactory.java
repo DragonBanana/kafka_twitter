@@ -45,7 +45,7 @@ public class TopicPartitionFactory {
     }
 
     public static int getMentionPartition(String mention) {
-        return Math.abs(mention.hashCode()) % (TopicPartitionFactory.TAG_PARTITIONS - 1);
+        return Math.abs(mention.hashCode()) % (TopicPartitionFactory.MENTION_PARTITIONS - 1);
     }
 
 
