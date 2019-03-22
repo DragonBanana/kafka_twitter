@@ -32,8 +32,9 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.94:9092");
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.94:9092");
+        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092");
         //TODO Check what transactional id has to be assigned
         props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "1");
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
