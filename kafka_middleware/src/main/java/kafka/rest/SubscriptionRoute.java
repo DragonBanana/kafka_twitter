@@ -30,7 +30,8 @@ public class SubscriptionRoute {
             Twitter twitter = Twitter.getTwitter();
 
             //Search for the user in the data structure
-            if (twitter.existUser(response, id)) return null;
+            if (twitter.existUser(id))
+                return "The user does not exist. In order to do a subscription please sign in first";
 
             SubscriptionStub subscriptionStub = twitter.getUser(id).getSubscriptionStub();
 

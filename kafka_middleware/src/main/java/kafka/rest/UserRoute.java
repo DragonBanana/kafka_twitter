@@ -27,15 +27,14 @@ public class UserRoute {
 
             User user;
             Twitter twitter = Twitter.getTwitter();
+            response.cookie("id", id);
 
             if (twitter.createNewUser(id)) {
-                System.out.println("New user created with id: " + id);
+                return "New user created with id: " + id;
             }
-            else
-                System.out.println("User already registered with id: " + id);
-
-            response.cookie("id", id);
-            return null;
+            else {
+                return "User already registered with id: " + id;
+            }
         });
 
     }

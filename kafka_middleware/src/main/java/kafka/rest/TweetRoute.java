@@ -3,10 +3,6 @@ package kafka.rest;
 import com.google.gson.Gson;
 import kafka.model.Tweet;
 import kafka.model.Twitter;
-import kafka.model.User;
-import kafka.utility.SubscriptionRequest;
-import spark.Response;
-
 
 import static spark.Spark.*;
 
@@ -18,7 +14,11 @@ public class TweetRoute {
 
             String id = request.cookie("id");
             //Search for the user in the data structure
-            if (!Twitter.getTwitter().existUser(response, id)) return null;
+            if (!Twitter.getTwitter().existUser(id)) {
+                response.status(404);
+                return "User does not exist. Sign in if you want to post a tweet";
+            }
+
             response.type("application/json");
             response.status(200);
             Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
@@ -29,8 +29,13 @@ public class TweetRoute {
         get("/tweets/*/*/*/latest",(request, response) -> {
 
             String id = request.cookie("id");
+
             //Search for the user in the data structure
-            if (!Twitter.getTwitter().existUser(response, id)) return null;
+            if (!Twitter.getTwitter().existUser(id)) {
+                response.status(404);
+                return "User does not exist. Sign in if you want to get the tweets";
+            }
+
             response.type("application/json");
             response.status(200);
 

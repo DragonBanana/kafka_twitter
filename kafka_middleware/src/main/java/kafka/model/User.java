@@ -39,4 +39,14 @@ public class User {
     public SubscriptionStub getSubscriptionStub() {
         return subscription;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            User user2 = (User) obj;
+            System.out.println(user2.id + " " + this.id);
+            return this.id.equals(user2.id);
+        } else
+            return false;
+    }
 }

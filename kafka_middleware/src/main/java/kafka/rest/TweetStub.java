@@ -16,6 +16,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,22 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TweetStub {
-
-
-    public static void main(String[] args) {
-        TweetStub tweetStub = new TweetStub();
-        List<String> tags = new ArrayList<>();
-        tags.add("#swag");
-        List<String> tags1 = new ArrayList<>();
-        tags1.add("#swag");
-        tags1.add("#swag2");
-        List<String> mentions = new ArrayList<>();
-        mentions.add("@bellofigo");
-        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
-        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
-        //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
-        tweetStub.findLatestByTag("luca", Arrays.asList("#swag"), "nofilters").stream().forEach(t -> System.out.println(new Gson().toJson(t)));
-    }
 
     /**
      * Save the tweet.
