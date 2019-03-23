@@ -36,7 +36,7 @@ public class TweetStub {
         mentions.add("@bellofigo");
         tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
         tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
-        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
+        //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
         tweetStub.findLatestByTag("luca", Arrays.asList("#swag"), "nofilters").stream().forEach(t -> System.out.println(new Gson().toJson(t)));
     }
 
@@ -47,9 +47,6 @@ public class TweetStub {
      */
 
     public Tweet save(Tweet tweet) {
-
-        //Creating producer
-        Producer<String, String> producer = ProducerFactory.getTweetProducer();
 
         //Get the filters used in the tweet.
         List<String> tweetFilters = tweet.getFilters();
@@ -65,20 +62,23 @@ public class TweetStub {
 
         //Send data to Kafka
 
-        producer.initTransactions();
-        try {
-            producer.beginTransaction();
-            records.forEach(producer::send);
-            producer.commitTransaction();
-        } catch (ProducerFencedException e) {
-            producer.close();
-        } catch (KafkaException e) {
-            producer.abortTransaction();
-        }
+        records.forEach(record -> {
+            Producer<String, String> producer = ProducerFactory.getTweetProducer();
+            producer.initTransactions();
+            try {
+                producer.beginTransaction();
+                producer.send(record);
+                producer.commitTransaction();
+            } catch (ProducerFencedException e) {
+                producer.close();
+            } catch (KafkaException e) {
+                producer.abortTransaction();
+            } finally {
+                producer.close();
+            }
+        });
 
 
-        producer.flush();
-        producer.close();
         return tweet;
 
     }

@@ -36,8 +36,9 @@ public class ProducerFactory {
         //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.94:9092");
         //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092");
         //TODO Check what transactional id has to be assigned
-        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "1");
-        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        String transactionId = Double.toString(Math.random());
+        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionId);
+        //props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "20000");

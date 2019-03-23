@@ -119,4 +119,14 @@ public class Tweet {
 
         return result;
     }
+
+    public boolean equals(Tweet t) {
+        return t.getFilters() == this.getFilters() &&
+                t.getTags() == this.getTags() &&
+                t.getLocation() == this.getLocation() &&
+                t.getAuthor() == this.getAuthor() &&
+                t.getContent() == this.getContent() &&
+                t.getMentions() == this.getMentions() &&
+                t.getTimestamp() == this.getTimestamp();
+    }
 }
