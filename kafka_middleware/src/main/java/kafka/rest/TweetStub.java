@@ -1,28 +1,24 @@
 package kafka.rest;
 
 import com.google.gson.Gson;
-import kafka.conf.ConsumerConfiguration;
 import kafka.db.AzureDBConn;
-import kafka.model.Offset;
-import kafka.model.OffsetKey;
-import kafka.model.Topic;
+import kafka.model.*;
 import kafka.utility.ConsumerFactory;
 import kafka.utility.ProducerFactory;
-import kafka.model.Tweet;
 import kafka.utility.TopicPartitionFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class TweetStub {
@@ -39,6 +35,7 @@ public class TweetStub {
         List<String> tweetFilters = tweet.getFilters();
         List<ProducerRecord<String, String>> records = new ArrayList<>();
 
+
         //Check where the tweet must be saved
         for (String filter : tweetFilters) {
             records.add(new ProducerRecord<>(filter, tweet.getLocation(),
@@ -47,23 +44,32 @@ public class TweetStub {
         System.out.println(tweetFilters);
         System.out.println(records);
 
+        long timestamp = 0;
+
         //Send data to Kafka
 
-        records.forEach(record -> {
+        for (ProducerRecord<String, String> record : records) {
             Producer<String, String> producer = ProducerFactory.getTweetProducer();
             producer.initTransactions();
             try {
                 producer.beginTransaction();
-                producer.send(record);
+                timestamp = producer.send(record).get().timestamp();
                 producer.commitTransaction();
             } catch (ProducerFencedException e) {
                 producer.close();
             } catch (KafkaException e) {
                 producer.abortTransaction();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             } finally {
                 producer.close();
             }
-        });
+        };
+
+        //Start SSE if there is no other instances of the thread active
+        if (Twitter.getTwitter().isSSEDone()) {
+            Twitter.getTwitter().startSSE(timestamp);
+        }
 
 
         return tweet;
@@ -73,17 +79,17 @@ public class TweetStub {
     /**
      * Main function for searching tweets given the filters.
      * @param id of requester.
-     * @param locationFilters location filters.
-     * @param tagFilters tag filters.
-     * @param mentionFilters mention filters.
+     * @param locationToFollow location filters.
+     * @param userToFollow tag filters.
+     * @param tagToFollow mention filters.
      * @return the latest tweet filtered using the filters params.
      */
-    public List<Tweet> findTweets(String id, String locationFilters, String tagFilters, String mentionFilters){
+    public List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow){
         //TODO
         //taking out filters by locations, userFollowed and tags
-        List<String> locationToFollow = new ArrayList<>(Arrays.asList(locationFilters.split("&")));
-        List<String> userToFollow = new ArrayList<>(Arrays.asList(mentionFilters.split("&")));
-        List<String> tagToFollow = new ArrayList<>(Arrays.asList(tagFilters.split("&")));
+        String locationFilters = StringUtils.join(locationToFollow,"");
+        String tagFilters = StringUtils.join(tagToFollow,"");
+        String mentionFilters = StringUtils.join(userToFollow,"");
         String filter = locationFilters + tagFilters + mentionFilters;
 
 

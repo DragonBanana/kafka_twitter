@@ -3,6 +3,10 @@ package kafka.rest;
 import kafka.model.Subscription;
 import kafka.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Stub for the Subscription
  */
@@ -52,5 +56,18 @@ public class SubscriptionStub {
         subscription.setLastPoll(newPoll);
         return newPoll;
     }
+
+    public List<String> getLocationsFollowed() {
+        return new ArrayList<>(subscription.getLocations());
+    }
+
+    public List<String> getTagsFollowed() {
+        return new ArrayList<>(subscription.getTags());
+    }
+
+    public List<String> getUsersFollowed() {
+        return new ArrayList<>(subscription.getFollowedUsers());
+    }
+
 
 }

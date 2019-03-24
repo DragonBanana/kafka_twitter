@@ -4,6 +4,10 @@ import com.google.gson.Gson;
 import kafka.model.Tweet;
 import kafka.model.Twitter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static spark.Spark.*;
 
 public class TweetRoute {
@@ -39,9 +43,9 @@ public class TweetRoute {
             response.type("application/json");
             response.status(200);
 
-            String locations = request.splat()[0];
-            String tags = request.splat()[1];
-            String mentions = request.splat()[2];
+            List<String> locations = Arrays.asList(request.splat()[0].split("&"));
+            List<String> tags = Arrays.asList(request.splat()[1].split("&"));
+            List<String> mentions = Arrays.asList(request.splat()[2].split("&"));
 
             return new Gson().toJson(new TweetStub().findTweets(id, locations, tags, mentions));
             //TODO check error in filters

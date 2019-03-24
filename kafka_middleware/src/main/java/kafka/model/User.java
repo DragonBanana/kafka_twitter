@@ -16,6 +16,11 @@ public class User {
     private SubscriptionStub subscription;
 
     /**
+     * Keeps track of connection for SSE
+     */
+    private VirtualClient virtualClient;
+
+    /**
      * The constructor.
      * @param id the identifier of the user.
      */
@@ -38,6 +43,14 @@ public class User {
      */
     public SubscriptionStub getSubscriptionStub() {
         return subscription;
+    }
+
+    public VirtualClient getVirtualClient() {
+        return virtualClient;
+    }
+
+    public void setVirtualClient(VirtualClient virtualClient) {
+        this.virtualClient = virtualClient;
     }
 
     @Override

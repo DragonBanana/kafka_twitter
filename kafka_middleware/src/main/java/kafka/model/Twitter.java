@@ -1,8 +1,16 @@
 package kafka.model;
 
 
+import jdk.internal.dynalink.beans.StaticClass;
+import kafka.rest.SSERoutine;
+
+import javax.jws.soap.SOAPBinding;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Singleton class for the Twitter model.
@@ -10,6 +18,8 @@ import java.util.Deque;
  */
 public class Twitter {
 
+    private Future<?> sseCompleted;
+    private ExecutorService sseRoutineThread;
     private static Twitter twitterSingleton;
     private Deque<User> users;
 
@@ -23,6 +33,7 @@ public class Twitter {
 
     private Twitter() {
         users = new ArrayDeque<>();
+        sseRoutineThread = Executors.newSingleThreadExecutor();
     }
 
     public boolean createNewUser(String id) {
@@ -56,5 +67,29 @@ public class Twitter {
     public boolean existUser(String id) {
         User user = getUser(id);
         return user != null;
+    }
+
+    public Deque<User> getUsers() {
+        return users;
+    }
+
+    /**
+     * Check if the SSERoutine is done
+     * @return true if the thread has ended otherwise false
+     */
+    public boolean isSSEDone() {
+        return sseCompleted.isDone();
+    }
+
+    /**
+     * Starts SSERoutine
+     * @param timestamp Upper bound of the window
+     */
+    public void startSSE(long timestamp) {
+        sseCompleted = sseRoutineThread.submit(new SSERoutine(timestamp));
+    }
+
+    public ExecutorService getSseRoutineThread() {
+        return sseRoutineThread;
     }
 }

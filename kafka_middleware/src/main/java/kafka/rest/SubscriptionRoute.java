@@ -37,6 +37,8 @@ public class SubscriptionRoute {
 
             SubscriptionStub subscriptionStub = twitter.getUser(id).getSubscriptionStub();
 
+            //TODO Set Virtual Client
+
 
             if (!locationToFollow.isEmpty()) {
                 locationToFollow.forEach(subscriptionStub::followLocation);

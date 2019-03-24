@@ -21,12 +21,12 @@ public class ConsumerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
-        //props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.237:29092");
+        //props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.237:29092");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");
-        props.put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-client");
+       // props.put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-client");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         return props;
