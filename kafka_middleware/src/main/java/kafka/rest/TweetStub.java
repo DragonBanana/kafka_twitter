@@ -85,6 +85,11 @@ public class TweetStub {
         List<String> tagToFollow = Arrays.asList(tagFilters.split("&"));
         String filter = locationFilters + tagFilters + mentionFilters;
 
+        if(userToFollow.get(0).equals("all") && userToFollow.size() == 1)
+            userToFollow.remove(0);
+        if(tagToFollow.get(0).equals("all") && tagToFollow.size() == 1)
+            tagToFollow.remove(0);
+
         userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
         tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
         if(!locationToFollow.isEmpty()){
