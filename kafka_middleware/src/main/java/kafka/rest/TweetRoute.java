@@ -43,8 +43,8 @@ public class TweetRoute {
             String tags = request.splat()[1];
             String mentions = request.splat()[2];
 
+            return new Gson().toJson(new TweetStub().findTweets(id, locations, tags, mentions));
             //TODO check error in filters
-            return new TweetStub().findTweets(id, locations, tags, mentions);
         });
     }
 }

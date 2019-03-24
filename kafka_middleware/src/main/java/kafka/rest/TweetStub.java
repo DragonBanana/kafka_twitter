@@ -19,6 +19,7 @@ import org.apache.kafka.common.errors.ProducerFencedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -80,10 +81,11 @@ public class TweetStub {
     public List<Tweet> findTweets(String id, String locationFilters, String tagFilters, String mentionFilters){
         //TODO
         //taking out filters by locations, userFollowed and tags
-        List<String> locationToFollow = Arrays.asList(locationFilters.split("&"));
-        List<String> userToFollow = Arrays.asList(mentionFilters.split("&"));
-        List<String> tagToFollow = Arrays.asList(tagFilters.split("&"));
+        List<String> locationToFollow = new ArrayList<>(Arrays.asList(locationFilters.split("&")));
+        List<String> userToFollow = new ArrayList<>(Arrays.asList(mentionFilters.split("&")));
+        List<String> tagToFollow = new ArrayList<>(Arrays.asList(tagFilters.split("&")));
         String filter = locationFilters + tagFilters + mentionFilters;
+
 
         if(userToFollow.get(0).equals("all") && userToFollow.size() == 1)
             userToFollow.clear();
@@ -159,7 +161,7 @@ public class TweetStub {
         long offset = new AzureDBConn().get(new OffsetKey(id, filter, partition)).getValue().getOffset();
         //Moving the offset.
         consumer.seek(topicPartition, offset);
-        consumer.poll(0);
+        consumer.poll(Duration.ofMillis(0));
         //Polling the data.
         ConsumerRecords<String,String> records = consumer.poll(100);
         //Transforming data and filtering. (!Only by location)
