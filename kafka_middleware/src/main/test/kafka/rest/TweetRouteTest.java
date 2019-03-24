@@ -2,17 +2,42 @@ package kafka.rest;
 
 import com.google.gson.Gson;
 import kafka.model.Tweet;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertTrue;
+import static spark.Spark.before;
+import static spark.Spark.path;
 
 public class TweetRouteTest {
 
     private String POST_URL = "http://localhost:4567/tweets";
+    private Thread server;
+
+    @Before
+    public void setUp() throws Exception {
+        server = new Thread(() -> {
+            path("/api", () -> {
+                before("/*", (q, a) -> LoggerFactory.getLogger(TwitterRest.class).info("Received api call"));
+
+                TweetRoute.configureRoutes();
+                UserRoute.configureRoutes();
+                SubscriptionRoute.configureRoutes();
+            });
+        });
+        Thread.sleep(4000);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        server.stop();
+    }
 
     /**
      * Testing the returned value of the post method
@@ -33,6 +58,7 @@ public class TweetRouteTest {
             wr.flush();
             wr.close();
             int responseCode = con.getResponseCode();
+            System.out.println(responseCode);
             assertTrue(responseCode >= 200 && responseCode < 300);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));

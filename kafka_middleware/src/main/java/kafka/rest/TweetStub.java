@@ -86,7 +86,7 @@ public class TweetStub {
         String filter = locationFilters + tagFilters + mentionFilters;
 
         if(userToFollow.get(0).equals("all") && userToFollow.size() == 1)
-            userToFollow.remove(0);
+            userToFollow.clear();
         if(tagToFollow.get(0).equals("all") && tagToFollow.size() == 1)
             tagToFollow.remove(0);
 
@@ -125,13 +125,13 @@ public class TweetStub {
         if(!users.isEmpty()){
             //filter result using users mentioned filter.
             tweets = tweets.stream()
-                    .filter(tweet -> (tweet.getMentions()).containsAll(users))
+                    .filter(tweet -> (users.stream().anyMatch(u -> tweet.getMentions().contains(u))))
                     .collect(Collectors.toList());
         }
         if(!tags.isEmpty()){
             //filter result using tags filter.
             tweets = tweets.stream()
-                    .filter(tweet -> (tweet.getTags()).containsAll(tags))
+                    .filter(tweet -> (tags.stream().anyMatch(t -> tweet.getTags().contains(t))))
                     .collect(Collectors.toList());
         }
         return tweets;
@@ -211,7 +211,7 @@ public class TweetStub {
         List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
             Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-            if(t.getTags().containsAll(tags))
+            if(t.getTags().stream().anyMatch(tags::contains))
                 tweets.add(t);
         });
         topicPartitions.forEach(topicPartition -> {
@@ -266,7 +266,7 @@ public class TweetStub {
         final List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
             Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-            if(t.getMentions().containsAll(mentions))
+            if(t.getMentions().stream().anyMatch(mentions::contains))
                 tweets.add(t);
         });
         topicPartitions.forEach(topicPartition -> {

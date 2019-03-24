@@ -11,8 +11,8 @@ import java.util.Properties;
 public class ProducerFactory {
 
     /**
-     * Return the producer for location topic.
-     * @return the producer for location topic.
+     * Return the producer.
+     * @return the producer.
      */
     public static Producer<String, String> getTweetProducer() {
 
@@ -32,8 +32,8 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.237:29092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.237:29092");
         //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092");
         //TODO Check what transactional id has to be assigned
         String transactionId = Double.toString(Math.abs(Math.random()));

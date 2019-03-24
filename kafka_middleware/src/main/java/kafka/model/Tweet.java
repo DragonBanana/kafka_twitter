@@ -121,12 +121,15 @@ public class Tweet {
     }
 
     public boolean equals(Tweet t) {
-        return t.getFilters() == this.getFilters() &&
-                t.getTags() == this.getTags() &&
-                t.getLocation() == this.getLocation() &&
-                t.getAuthor() == this.getAuthor() &&
-                t.getContent() == this.getContent() &&
-                t.getMentions() == this.getMentions() &&
-                t.getTimestamp() == this.getTimestamp();
+        return t.getFilters().containsAll(this.getFilters()) &&
+                this.getFilters().containsAll(t.getFilters()) &&
+                t.getTags().containsAll(this.getTags()) &&
+                this.getTags().containsAll(t.getTags()) &&
+                t.getMentions().containsAll(this.getMentions()) &&
+                this.getMentions().containsAll(t.getMentions()) &&
+                t.getLocation().equals(this.getLocation()) &&
+                t.getAuthor().equals(this.getAuthor()) &&
+                t.getContent().equals(this.getContent()) &&
+                t.getTimestamp().equals(this.getTimestamp());
     }
 }

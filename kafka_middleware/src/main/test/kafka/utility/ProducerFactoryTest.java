@@ -36,4 +36,5 @@ public class ProducerFactoryTest {
         assertTrue(producer.partitionsFor(Topic.MENTION).size() > 0);
         assertTrue(producer.partitionsFor(Topic.LOCATION).size() > 0);
     }
+
 }
