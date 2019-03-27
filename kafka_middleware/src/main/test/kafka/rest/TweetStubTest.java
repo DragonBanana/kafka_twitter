@@ -23,8 +23,12 @@ public class TweetStubTest {
         List<String> mentions = new ArrayList<>();
         mentions.add("@bellofigo");
         //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
-        tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
+        try {
+            tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags, mentions ));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
-        tweetStub.findLatestByTag("luca", Arrays.asList("#swag"), "nofilters").stream().forEach(t -> System.out.println(new Gson().toJson(t)));
+        tweetStub.findLatestByTag("luca", Arrays.asList("#swag"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
     }
 }

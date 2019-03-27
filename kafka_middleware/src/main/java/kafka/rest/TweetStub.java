@@ -29,12 +29,11 @@ public class TweetStub {
      * @return the tweet that has been saved.
      */
 
-    public Tweet save(Tweet tweet) {
+    public Tweet save(Tweet tweet) throws Exception{
 
         //Get the filters used in the tweet.
         List<String> tweetFilters = tweet.getFilters();
         List<ProducerRecord<String, String>> records = new ArrayList<>();
-
 
         //Check where the tweet must be saved
         for (String filter : tweetFilters) {
@@ -44,33 +43,30 @@ public class TweetStub {
         System.out.println(tweetFilters);
         System.out.println(records);
 
-        long timestamp = 0;
 
-        //Send data to Kafka
+        if(tweet.getTags().stream().allMatch(s -> s.startsWith("#")) && tweet.getMentions().stream().allMatch(s -> s.startsWith("@"))) {
+            //Send data to Kafka
 
-        for (ProducerRecord<String, String> record : records) {
-            Producer<String, String> producer = ProducerFactory.getTweetProducer();
-            producer.initTransactions();
-            try {
-                producer.beginTransaction();
-                timestamp = producer.send(record).get().timestamp();
-                producer.commitTransaction();
-            } catch (ProducerFencedException e) {
-                producer.close();
-            } catch (KafkaException e) {
-                producer.abortTransaction();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            } finally {
-                producer.close();
-            }
-        };
+            records.forEach(record -> {
+                Producer<String, String> producer = ProducerFactory.getTweetProducer();
+                producer.initTransactions();
+                try {
+                    producer.beginTransaction();
+                    producer.send(record);
+                    producer.commitTransaction();
+                } catch (ProducerFencedException e) {
+                    producer.close();
+                } catch (KafkaException e) {
+                    producer.abortTransaction();
+                } finally {
+                    producer.close();
+                }
+            });
 
-        //Start SSE if there is no other instances of the thread active
-        if (Twitter.getTwitter().isSSEDone()) {
-            Twitter.getTwitter().startSSE(timestamp);
+
+        } else {
+            throw new Exception();
         }
-
 
         return tweet;
 
@@ -92,14 +88,15 @@ public class TweetStub {
         String mentionFilters = StringUtils.join(userToFollow,"");
         String filter = locationFilters + tagFilters + mentionFilters;
 
-
+        if(locationToFollow.get(0).equals("all") && locationToFollow.size() == 1)
+            locationToFollow.clear();
         if(userToFollow.get(0).equals("all") && userToFollow.size() == 1)
             userToFollow.clear();
         if(tagToFollow.get(0).equals("all") && tagToFollow.size() == 1)
             tagToFollow.remove(0);
 
-        userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
-        tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
+        //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
+        //tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
         if(!locationToFollow.isEmpty()){
             return filterByLocation(id, locationToFollow, userToFollow, tagToFollow, filter);
         }
