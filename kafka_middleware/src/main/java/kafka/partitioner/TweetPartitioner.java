@@ -26,6 +26,7 @@ public class TweetPartitioner implements Partitioner {
         if(topic.equals(Topic.LOCATION)){
             String location = tweet.getLocation();
             int hashLocation = location.hashCode();
+            System.out.println(numPartitions);
             return (Math.abs(hashLocation)) % (numPartitions);
         }
         if(topic.equals(Topic.MENTION)){
@@ -35,15 +36,16 @@ public class TweetPartitioner implements Partitioner {
                 System.out.println(numPartitions);
                 return (Math.abs(hashMention))%(numPartitions-1);
             }
-            return numPartitions;
+            return numPartitions - 1;
         }
         if(topic.equals(Topic.TAG)){
             if (tweet.getTags().size() == 1){
                 String tag = tweet.getTags().get(0);
                 int hashTag = tag.hashCode();
+                System.out.println(numPartitions);
                 return (Math.abs(hashTag))%(numPartitions-1);
             }
-            return numPartitions;
+            return numPartitions - 1;
         }
         return 1;
     }

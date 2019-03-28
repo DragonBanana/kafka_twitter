@@ -18,7 +18,7 @@ public class OffsetEntity extends TableServiceEntity {
 
     public OffsetEntity(Offset offset) {
         this.partitionKey = offset.getKey().getUser();
-        this.rowKey = offset.getKey().getUser()+offset.getKey().getTopicPartition();
+        this.rowKey = offset.getKey().getUser()+offset.getKey().getTopicPartition()+offset.getKey().getFilter().hashCode();
         this.user = offset.getKey().getUser();
         this.filter = offset.getKey().getFilter();
         this.topicPartition = offset.getKey().getTopicPartition();

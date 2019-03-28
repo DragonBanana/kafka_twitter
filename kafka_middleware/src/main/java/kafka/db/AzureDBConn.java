@@ -58,7 +58,7 @@ public class AzureDBConn {
             CloudTable cloudTable = tableClient.getTableReference(tableName);
             // Create a cloud table object for the table.
             TableOperation tableOperation =
-                    TableOperation.retrieve(key.getUser(), key.getUser() + key.getTopicPartition(), OffsetEntity.class);
+                    TableOperation.retrieve(key.getUser(), key.getUser() + key.getTopicPartition() + key.getFilter().hashCode(), OffsetEntity.class);
             // Submit the operation to the table service and get the specific entity.
             OffsetEntity entity = cloudTable.execute(tableOperation).getResultAsType();
             if(entity == null) {
