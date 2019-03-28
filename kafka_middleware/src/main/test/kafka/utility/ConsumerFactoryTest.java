@@ -41,6 +41,5 @@ public class ConsumerFactoryTest {
         assertTrue(topics.contains(Topic.TAG));
         assertTrue(topics.contains(Topic.MENTION));
         assertTrue(topics.contains(Topic.LOCATION));
-        assertFalse(topics.contains("swagbellofigoguu"));
     }
 }

@@ -30,5 +30,6 @@ public class TweetStubTest {
         }
         //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
         tweetStub.findLatestByTag("luca", Arrays.asList("#swag"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
+        //System.out.println(tweetStub.findLatestByLocation("luca", "verona", "nofilters").size());
     }
 }

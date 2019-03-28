@@ -32,6 +32,7 @@ public class TweetPartitioner implements Partitioner {
             if (tweet.getMentions().size() == 1){
                 String mention = tweet.getMentions().get(0);
                 int hashMention = mention.hashCode();
+                System.out.println(numPartitions);
                 return (Math.abs(hashMention))%(numPartitions-1);
             }
             return numPartitions;

@@ -32,16 +32,17 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
         //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.237:29092");
         //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "151.0.231.141:32768");
         //TODO Check what transactional id has to be assigned
         String transactionId = Double.toString(Math.abs(Math.random()));
         props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionId);
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "20000");
+        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "10000");
         return props;
     }
 

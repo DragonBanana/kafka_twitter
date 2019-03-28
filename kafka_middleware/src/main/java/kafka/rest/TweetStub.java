@@ -6,6 +6,7 @@ import kafka.model.*;
 import kafka.utility.ConsumerFactory;
 import kafka.utility.ProducerFactory;
 import kafka.utility.TopicPartitionFactory;
+import kafka.utility.TweetFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
@@ -47,8 +48,10 @@ public class TweetStub {
         if(tweet.getTags().stream().allMatch(s -> s.startsWith("#")) && tweet.getMentions().stream().allMatch(s -> s.startsWith("@"))) {
             //Send data to Kafka
 
+
             records.forEach(record -> {
                 Producer<String, String> producer = ProducerFactory.getTweetProducer();
+
                 producer.initTransactions();
                 try {
                     producer.beginTransaction();
@@ -128,16 +131,10 @@ public class TweetStub {
         }
 
         if(!users.isEmpty()){
-            //filter result using users mentioned filter.
-            tweets = tweets.stream()
-                    .filter(tweet -> (users.stream().anyMatch(u -> tweet.getMentions().contains(u))))
-                    .collect(Collectors.toList());
+            tweets = TweetFilter.filterByMentions(tweets, users);
         }
         if(!tags.isEmpty()){
-            //filter result using tags filter.
-            tweets = tweets.stream()
-                    .filter(tweet -> (tags.stream().anyMatch(t -> tweet.getTags().contains(t))))
-                    .collect(Collectors.toList());
+            tweets = TweetFilter.filterByTags(tweets, tags);
         }
         return tweets;
     }
@@ -166,7 +163,7 @@ public class TweetStub {
         consumer.seek(topicPartition, offset);
         consumer.poll(Duration.ofMillis(0));
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(100);
+        ConsumerRecords<String,String> records = consumer.poll(10000);
         //Transforming data and filtering. (!Only by location)
         List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
         //Getting the new offset.
@@ -219,6 +216,7 @@ public class TweetStub {
             if(t.getTags().stream().anyMatch(tags::contains))
                 tweets.add(t);
         });
+        System.out.println(tweets.size());
         topicPartitions.forEach(topicPartition -> {
             //Getting the new offset.
             long offset = consumer.position(topicPartition);
