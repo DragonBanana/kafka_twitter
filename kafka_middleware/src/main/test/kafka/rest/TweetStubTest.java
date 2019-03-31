@@ -3,6 +3,7 @@ package kafka.rest;
 import com.google.gson.Gson;
 import kafka.model.Tweet;
 import kafka.utility.TweetFilter;
+import org.apache.commons.collections.list.SynchronizedList;
 import org.apache.velocity.util.ArrayListWrapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -128,7 +129,7 @@ public class TweetStubTest {
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
 
-        tweets = new TweetStub().findLatestByTags(id+"tag2", Collections.singletonList("#tag2"), filter+"#tag2");
+        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag2"), filter+"#tag2");
         assertTrue(tweets.size() > 1);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
@@ -147,4 +148,39 @@ public class TweetStubTest {
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
     }
+
+    @Test
+    public void consumeTweetByMention() {
+        tweetList.forEach(t -> {
+            try {
+                new TweetStub().save(t);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        List<Tweet> tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men1"), filter+"@men1");
+        assertTrue(tweets.size() > 0);
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
+
+        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men2"), filter+"@men2");
+        assertTrue(tweets.size() > 1);
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
+        assertTrue(tweets.stream().noneMatch(t -> t.equals(tweetList.get(2))));
+
+
+        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men3"), filter+"@men3");
+        assertTrue(tweets.size() > 2);
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
+
+        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men4"), filter+"@men4");
+        assertTrue(tweets.size() > 1);
+        assertTrue(tweets.stream().noneMatch(t -> t.equals(tweetList.get(0))));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
+    }
+
+
 }

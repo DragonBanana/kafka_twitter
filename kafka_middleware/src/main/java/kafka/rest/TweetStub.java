@@ -44,7 +44,7 @@ public class TweetStub {
         System.out.println(tweetFilters);
         System.out.println(records);
 
-        if(tweet.getTags().stream().allMatch(s -> s.startsWith("#")) && tweet.getMentions().stream().allMatch(s -> s.startsWith("@"))) {
+        //if(tweet.getTags().stream().allMatch(s -> s.startsWith("#")) && tweet.getMentions().stream().allMatch(s -> s.startsWith("@"))) {
             //Send data to Kafka
             records.forEach(record -> {
                 Producer<String, String> producer = ProducerFactory.getTweetProducer();
@@ -64,9 +64,9 @@ public class TweetStub {
             });
 
 
-        } else {
-            throw new Exception();
-        }
+        //} else {
+        //    throw new Exception();
+        //}
 
         return tweet;
 
@@ -100,7 +100,6 @@ public class TweetStub {
         List<Tweet> tweets;
         if(!locationToFollow.isEmpty()){
             tweets = findLatestByLocations(id, locationToFollow,filter);
-            System.out.println(tweets.size());
         }
         else if(userToFollow.isEmpty()){
             //filter tweet using only tag.
@@ -109,6 +108,7 @@ public class TweetStub {
         else
             //filter tweet using users mentioned (and tag if present).
             tweets = findLatestByMentions(id, userToFollow, filter);
+
         tweets = TweetFilter.filterByLocations(tweets, locationToFollow);
         tweets = TweetFilter.filterByMentions(tweets, userToFollow);
         tweets = TweetFilter.filterByTags(tweets, tagToFollow);
@@ -211,7 +211,6 @@ public class TweetStub {
             if(t.getTags().stream().anyMatch(tags::contains))
                 tweets.add(t);
         });
-        System.out.println(tweets.size());
         topicPartitions.forEach(topicPartition -> {
             //Getting the new offset.
             long offset = consumer.position(topicPartition);
