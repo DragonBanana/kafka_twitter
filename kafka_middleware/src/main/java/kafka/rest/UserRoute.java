@@ -17,7 +17,7 @@ public class UserRoute {
      * If it does not exist create a new user otherwise log the user into the system.
      * In both cases attach a cookie in the response.
      */
-    static void configureRoutes() {
+    public static void configureRoutes() {
         post("/users/:id", (request, response) -> {
 
             response.type("application/json");
