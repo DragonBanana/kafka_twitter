@@ -32,9 +32,6 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
-        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.237:29092");
-        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092");
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "151.0.231.141:32768");
         //TODO Check what transactional id has to be assigned
         String transactionId = Double.toString(Math.abs(Math.random()));

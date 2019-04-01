@@ -39,7 +39,6 @@ public class SubscriptionRoute {
 
             //TODO Set Virtual Client
 
-
             if (!locationToFollow.isEmpty()) {
                 locationToFollow.forEach(subscriptionStub::followLocation);
             }
@@ -53,7 +52,8 @@ public class SubscriptionRoute {
             }
 
             response.status(200);
-            return "Subscriptions created";
+            //return "Subscriptions created";
+            return new Gson().toJson(subscriptionStub);
         });
     }
 }

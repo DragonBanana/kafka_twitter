@@ -2,6 +2,8 @@ package kafka.model;
 
 import kafka.rest.SubscriptionStub;
 
+import java.util.List;
+
 public class User {
 
     /**
@@ -27,6 +29,7 @@ public class User {
     public User(String id) {
         this.id = id;
         subscription = new SubscriptionStub(this);
+        virtualClient = new VirtualClient();
     }
 
     /**
@@ -61,5 +64,9 @@ public class User {
             return this.id.equals(user2.id);
         } else
             return false;
+    }
+
+    public void notityTweets(List<Tweet> tweets) {
+        getVirtualClient().notityTweets(tweets);
     }
 }

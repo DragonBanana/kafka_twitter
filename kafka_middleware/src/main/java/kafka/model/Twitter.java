@@ -1,13 +1,11 @@
 package kafka.model;
 
 
-import jdk.internal.dynalink.beans.StaticClass;
 import kafka.rest.SSERoutine;
+import kafka.rest.TweetStub;
 
-import javax.jws.soap.SOAPBinding;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -78,7 +76,8 @@ public class Twitter {
      * @return true if the thread has ended otherwise false
      */
     public boolean isSSEDone() {
-        return sseCompleted.isDone();
+        if (sseCompleted != null) return sseCompleted.isDone();
+        else return true;
     }
 
     /**
@@ -86,7 +85,7 @@ public class Twitter {
      * @param timestamp Upper bound of the window
      */
     public void startSSE(long timestamp) {
-        sseCompleted = sseRoutineThread.submit(new SSERoutine(timestamp));
+        sseCompleted = sseRoutineThread.submit(new SSERoutine(timestamp, new TweetStub()));
     }
 
     public ExecutorService getSseRoutineThread() {

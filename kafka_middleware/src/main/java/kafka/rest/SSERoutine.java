@@ -9,22 +9,30 @@ import java.util.*;
 
 public class SSERoutine implements Runnable {
 
+    private final TweetStub tweetStub;
     private long timestamp;
-    private final long window = Duration.ofMinutes(5).getSeconds() * 1000;
+    private final long window = Duration.ofSeconds(3).getSeconds() * 1000;
 
-    public SSERoutine(long timestamp) {
+    public SSERoutine(long timestamp, TweetStub tweetStub) {
+        this.tweetStub = tweetStub;
         this.timestamp = timestamp;
     }
 
     @Override
     public void run() {
+        checkSSEForUsers();
+    }
+
+    private void checkSSEForUsers() {
         ArrayDeque<User> users = (ArrayDeque<User>) Twitter.getTwitter().getUsers();
         boolean stop = false;
+        int iterations = 0;
 
-        while (!stop) {
+        while (!stop && (iterations != users.size())) {
             User user = users.removeFirst();
 
             if ((timestamp - user.getSubscriptionStub().lastPoll()) > window) {
+                System.out.println("updating for " + user.getId());
                 //todo get subscription
                 SubscriptionStub subscription = user.getSubscriptionStub();
 
@@ -33,10 +41,10 @@ public class SSERoutine implements Runnable {
                 List<String> usersFollowed = subscription.getUsersFollowed();
 
                 //TODO poll()
-                List<Tweet> tweets = new TweetStub().findTweets(user.getId(), locationsFollowed, tagsFollowed, usersFollowed);
+                List<Tweet> tweets = tweetStub.findTweets(user.getId(), locationsFollowed, tagsFollowed, usersFollowed);
 
                 //todo VirtualClient.notify();
-                user.getVirtualClient().notityTweets(tweets);
+                user.notityTweets(tweets);
 
                 //update poll
                 subscription.updatePoll(timestamp);
@@ -47,6 +55,8 @@ public class SSERoutine implements Runnable {
                 users.addFirst(user);
                 stop = true;
             }
+            iterations++;
         }
+        System.out.println("users size " + users.size());
     }
 }

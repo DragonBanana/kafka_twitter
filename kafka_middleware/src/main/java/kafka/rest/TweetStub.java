@@ -14,6 +14,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -26,11 +27,12 @@ public class TweetStub {
 
     /**
      * Save the tweet.
+     *
      * @param tweet the tweet that has to be saved.
      * @return the tweet that has been saved.
      */
 
-    public Tweet save(Tweet tweet) throws Exception{
+    public Tweet save(Tweet tweet) throws Exception {
 
         //Get the filters used in the tweet.
         List<String> tweetFilters = tweet.getFilters();
@@ -44,29 +46,38 @@ public class TweetStub {
         System.out.println(tweetFilters);
         System.out.println(records);
 
+        long timestamp = 0;
+
         //if(tweet.getTags().stream().allMatch(s -> s.startsWith("#")) && tweet.getMentions().stream().allMatch(s -> s.startsWith("@"))) {
-            //Send data to Kafka
-            records.forEach(record -> {
-                Producer<String, String> producer = ProducerFactory.getTweetProducer();
+        //Send data to Kafka
+        for (ProducerRecord<String, String> record : records) {
+            Producer<String, String> producer = ProducerFactory.getTweetProducer();
 
-                producer.initTransactions();
-                try {
-                    producer.beginTransaction();
-                    producer.send(record);
-                    producer.commitTransaction();
-                } catch (ProducerFencedException e) {
-                    producer.close();
-                } catch (KafkaException e) {
-                    producer.abortTransaction();
-                } finally {
-                    producer.close();
-                }
-            });
-
+            producer.initTransactions();
+            try {
+                producer.beginTransaction();
+                timestamp = producer.send(record).get().timestamp();
+                producer.commitTransaction();
+            } catch (ProducerFencedException e) {
+                producer.close();
+            } catch (KafkaException e) {
+                producer.abortTransaction();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            } finally {
+                producer.close();
+            }
+        }
 
         //} else {
         //    throw new Exception();
         //}
+
+        if (Twitter.getTwitter().isSSEDone()) {
+            System.out.println("Start SSE Routine");
+            Twitter.getTwitter().startSSE(timestamp);
+        } else
+            System.out.println("Already executing SSE");
 
         return tweet;
 
@@ -74,38 +85,38 @@ public class TweetStub {
 
     /**
      * Main function for searching tweets given the filters.
-     * @param id of requester.
+     *
+     * @param id               of requester.
      * @param locationToFollow location filters.
-     * @param userToFollow tag filters.
-     * @param tagToFollow mention filters.
+     * @param userToFollow     tag filters.
+     * @param tagToFollow      mention filters.
      * @return the latest tweet filtered using the filters params.
      */
-    public List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow){
+    public List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow) {
         //TODO
         //taking out filters by locations, userFollowed and tags
-        String locationFilters = StringUtils.join(locationToFollow,"");
-        String tagFilters = StringUtils.join(tagToFollow,"");
-        String mentionFilters = StringUtils.join(userToFollow,"");
+        String locationFilters = StringUtils.join(locationToFollow, "");
+        String tagFilters = StringUtils.join(tagToFollow, "");
+        String mentionFilters = StringUtils.join(userToFollow, "");
         String filter = locationFilters + tagFilters + mentionFilters;
 
-        if(locationToFollow.get(0).equals("all") && locationToFollow.size() == 1)
+
+        if (!locationToFollow.isEmpty() && locationToFollow.get(0).equals("all") && locationToFollow.size() == 1)
             locationToFollow.clear();
-        if(userToFollow.get(0).equals("all") && userToFollow.size() == 1)
+        if (!userToFollow.isEmpty() && userToFollow.get(0).equals("all") && userToFollow.size() == 1)
             userToFollow.clear();
-        if(tagToFollow.get(0).equals("all") && tagToFollow.size() == 1)
+        if (!tagToFollow.isEmpty() && tagToFollow.get(0).equals("all") && tagToFollow.size() == 1)
             tagToFollow.remove(0);
 
         //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
         //tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
         List<Tweet> tweets;
-        if(!locationToFollow.isEmpty()){
-            tweets = findLatestByLocations(id, locationToFollow,filter);
-        }
-        else if(userToFollow.isEmpty()){
+        if (!locationToFollow.isEmpty()) {
+            tweets = findLatestByLocations(id, locationToFollow, filter);
+        } else if (userToFollow.isEmpty()) {
             //filter tweet using only tag.
             tweets = findLatestByTags(id, tagToFollow, filter);
-        }
-        else
+        } else
             //filter tweet using users mentioned (and tag if present).
             tweets = findLatestByMentions(id, userToFollow, filter);
 
@@ -118,9 +129,10 @@ public class TweetStub {
 
     /**
      * Return the latest tweet filtered by location.
-     * @param id the identifier of the requester.
+     *
+     * @param id       the identifier of the requester.
      * @param location the location.
-     * @param filter the filters for the research.
+     * @param filter   the filters for the research.
      * @return the latest tweet filtered by location.
      */
     private List<Tweet> findLatestByLocation(String id, String location, String filter) {
@@ -153,9 +165,10 @@ public class TweetStub {
 
     /**
      * Return the latest tweet filtered by locations.
-     * @param id the identifier of the requester.
+     *
+     * @param id        the identifier of the requester.
      * @param locations the locations.
-     * @param filter the filters for the research.
+     * @param filter    the filters for the research.
      * @return the latest tweet filtered by location.
      */
     public List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
@@ -163,13 +176,15 @@ public class TweetStub {
                 .map(l -> findLatestByLocation(id, l, filter))
                 .reduce((l1, l2) -> {
                     l1.addAll(l2);
-                    return l1;}).orElseGet(null);
+                    return l1;
+                }).orElseGet(null);
     }
 
     /**
      * Return the latest tweet filtered by tags.
-     * @param id the identifier of the requester.
-     * @param tags the list of tags.
+     *
+     * @param id     the identifier of the requester.
+     * @param tags   the list of tags.
      * @param filter the filters for the research.
      * @return the latest tweet filtered by tags.
      */
@@ -180,7 +195,7 @@ public class TweetStub {
         Consumer<String, String> consumer = ConsumerFactory.getConsumer();
         //Declaring two partitions: the first for 1 tag search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
-        if(tags.size() == 1) {
+        if (tags.size() == 1) {
             //Getting the partition of the topic.
             int partition = TopicPartitionFactory.getTagPartition(tags.get(0));
             //Creating the topic partition object (it is required in the next instructions).
@@ -208,7 +223,7 @@ public class TweetStub {
         List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
             Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-            if(t.getTags().stream().anyMatch(tags::contains))
+            if (t.getTags().stream().anyMatch(tags::contains))
                 tweets.add(t);
         });
         topicPartitions.forEach(topicPartition -> {
@@ -224,9 +239,10 @@ public class TweetStub {
 
     /**
      * Return the latest tweet filtered by Mention.
-     * @param id the identifier of the requester.
+     *
+     * @param id       the identifier of the requester.
      * @param mentions the user mentioned filters.
-     * @param filter the filters for the research.
+     * @param filter   the filters for the research.
      * @return the latest tweet filtered by user.
      */
     public List<Tweet> findLatestByMentions(String id, List<String> mentions, String filter) {
@@ -237,7 +253,7 @@ public class TweetStub {
         Consumer<String, String> consumer = ConsumerFactory.getConsumer();
         //Declaring two partitions: the first for 1 mention search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
-        if(mentions.size() == 1) {
+        if (mentions.size() == 1) {
             //Getting the partition of the topic.
             int partition = TopicPartitionFactory.getMentionPartition(mentions.get(0));
             //Creating the topic partition object (it is required in the next instructions).
@@ -263,7 +279,7 @@ public class TweetStub {
         final List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
             Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-            if(t.getMentions().stream().anyMatch(mentions::contains))
+            if (t.getMentions().stream().anyMatch(mentions::contains))
                 tweets.add(t);
         });
         topicPartitions.forEach(topicPartition -> {
