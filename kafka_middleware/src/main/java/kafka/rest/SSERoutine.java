@@ -3,6 +3,7 @@ package kafka.rest;
 import kafka.model.Tweet;
 import kafka.model.Twitter;
 import kafka.model.User;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
@@ -29,10 +30,8 @@ public class SSERoutine implements Runnable {
         int iterations = 0;
 
         while (!stop && (iterations != users.size())) {
-            User user = users.removeFirst();
-
+            User user = users.getFirst();
             if ((timestamp - user.getSubscriptionStub().lastPoll()) > window) {
-                System.out.println("updating for " + user.getId());
                 //todo get subscription
                 SubscriptionStub subscription = user.getSubscriptionStub();
 
@@ -41,8 +40,18 @@ public class SSERoutine implements Runnable {
                 List<String> usersFollowed = subscription.getUsersFollowed();
 
                 //TODO poll()
-                List<Tweet> tweets = tweetStub.findTweets(user.getId(), locationsFollowed, tagsFollowed, usersFollowed);
+                //List<Tweet> tweets = tweetStub.findTweets(user.getId(), locationsFollowed, tagsFollowed, usersFollowed);
 
+                List<Tweet> tweets = new ArrayList<>();
+                LoggerFactory.getLogger(TwitterRest.class).info(locationsFollowed.toString());
+                tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Arrays.asList("all"), Arrays.asList("all")));
+                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
+                tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), tagsFollowed, Arrays.asList("all")));
+                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
+                tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), Arrays.asList("all"), usersFollowed));
+                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
+
+                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 //todo VirtualClient.notify();
                 user.notityTweets(tweets);
 
@@ -50,6 +59,7 @@ public class SSERoutine implements Runnable {
                 subscription.updatePoll(timestamp);
 
                 //add at the end of the queue
+                users.removeFirst();
                 users.addLast(user);
             } else {
                 users.addFirst(user);
@@ -57,6 +67,7 @@ public class SSERoutine implements Runnable {
             }
             iterations++;
         }
+        LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
         System.out.println("users size " + users.size());
     }
 }

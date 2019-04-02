@@ -14,20 +14,19 @@ public class TopicPartitionFactory {
      */
     public static final int TAG_PARTITIONS = 60;
 
-
     /**
-     * The number of partitions in 'tag' topic.
+     * The partition of the blob storage, where the tweets with composed tags are inserted.
      */
     public static final int TAG_PARTITION_BLOB = 59;
 
     /**
-     * The number of partitions in 'tag' topic.
+     * The number of partitions in 'mention' topic.
      */
     public static final int MENTION_PARTITIONS = 60;
 
 
     /**
-     * The number of partitions in 'tag' topic.
+     * The partition of the blob storage, where the tweets with composed mentions are inserted.
      */
     public static final int MENTION_PARTITION_BLOB = 59;
 

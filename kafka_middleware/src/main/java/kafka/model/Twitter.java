@@ -69,6 +69,7 @@ public class Twitter {
 
     public Deque<User> getUsers() {
         return users;
+        //return new ArrayDeque<>(users);
     }
 
     /**

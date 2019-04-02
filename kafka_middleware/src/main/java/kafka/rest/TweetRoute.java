@@ -18,6 +18,7 @@ public class TweetRoute {
 
     public static void configureRoutes() {
 
+
         post("/tweets", (request, response) -> {
 
             String id = request.cookie("id");
@@ -34,7 +35,9 @@ public class TweetRoute {
             return "Tweet created" + new Gson().toJson(tweet);
         });
 
-        get("/tweets/*/*/*/latest",(request, response) -> {
+        get("/tweets/*/*/*/latest", (request, response) -> {
+
+            System.out.println("Wow" + Twitter.getTwitter().getUsers().size());
 
             String id = request.cookie("id");
 
@@ -55,7 +58,7 @@ public class TweetRoute {
             //TODO check error in filters
         });
 
-        post("/tweets/subscription/*/*/*",(request, response) -> {
+        post("/tweets/subscription/*/*/*", (request, response) -> {
 
             String id = request.cookie("id");
 
@@ -76,69 +79,5 @@ public class TweetRoute {
             //TODO check error in filters
         });
 
-        get("/sse",(request, response) -> {
-
-
-            System.out.println("richiesta ricevuta");
-
-            response.header("Connection", "keep-alive");
-            response.header("Content-Type", "text/event-stream");
-            response.header("Cache-control", "no-cache");
-            response.raw().setContentType("text/event-stream");
-            response.header("Access-Control-Allow-Origin", "*");
-            response.status(200);
-            //OutputStream out = null;
-            //try {
-                //out = response.raw().getOutputStream();
-            //} catch (IOException e) {
-            //    e.printStackTrace();
-            //}
-
-            response.raw().setStatus(200);
-            response.raw().setContentType("text/event-stream");
-            //response.raw().setHeader("Access-Control-Allow-Origin", "*");
-            response.raw().setHeader("Connection", "keep-alive");
-            response.raw().setHeader("Content-Type", "text/event-stream");
-            response.raw().setHeader("Cache-control", "no-cache");
-            PrintWriter p = response.raw().getWriter();
-            p.print("id: 99\nevent: eventType\ndata: CIAO\n\n\n");
-            p.flush();
-
-
-
-            new Thread(() -> {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                //send(response);
-            }).start();
-
-            return "id: 99\nevent: eventType\ndata: RETURN \n\n\n";
-        });
-    }
-
-    private static void send(Response response) {
-
-        for(int i = 0; i < 1; i++) {
-            OutputStream out = null;
-            try {
-                out = response.raw().getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            response.raw().setStatus(200);
-            response.raw().setContentType("text/event-stream");
-            //response.raw().setHeader("Access-Control-Allow-Origin", "*");
-            response.raw().setHeader("Connection", "keep-alive");
-            response.raw().setHeader("Content-Type", "text/event-stream");
-            response.raw().setHeader("Cache-control", "no-cache");
-            PrintWriter p = new PrintWriter(out);
-            p.print("id: 99\nevent: eventType\ndata: CIAO\n\n\n");
-
-
-        }
     }
 }

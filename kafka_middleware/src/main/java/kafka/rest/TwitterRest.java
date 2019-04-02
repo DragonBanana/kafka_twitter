@@ -15,6 +15,7 @@ public class TwitterRest {
 
     public static void main(String[] args) {
 
+        webSocket("/ws", WSHandler.class);
         path("/api", () -> {
             before("/*", (q, a) -> logger.info("Received api call"));
 
@@ -22,5 +23,6 @@ public class TwitterRest {
             UserRoute.configureRoutes();
             SubscriptionRoute.configureRoutes();
         });
+        init();
     }
 }

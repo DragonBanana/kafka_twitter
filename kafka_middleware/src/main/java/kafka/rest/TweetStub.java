@@ -78,7 +78,6 @@ public class TweetStub {
             Twitter.getTwitter().startSSE(timestamp);
         } else
             System.out.println("Already executing SSE");
-
         return tweet;
 
     }
@@ -93,20 +92,25 @@ public class TweetStub {
      * @return the latest tweet filtered using the filters params.
      */
     public List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow) {
-        //TODO
+
         //taking out filters by locations, userFollowed and tags
         String locationFilters = StringUtils.join(locationToFollow, "");
         String tagFilters = StringUtils.join(tagToFollow, "");
         String mentionFilters = StringUtils.join(userToFollow, "");
         String filter = locationFilters + tagFilters + mentionFilters;
 
-
-        if (!locationToFollow.isEmpty() && locationToFollow.get(0).equals("all") && locationToFollow.size() == 1)
-            locationToFollow.clear();
-        if (!userToFollow.isEmpty() && userToFollow.get(0).equals("all") && userToFollow.size() == 1)
-            userToFollow.clear();
-        if (!tagToFollow.isEmpty() && tagToFollow.get(0).equals("all") && tagToFollow.size() == 1)
-            tagToFollow.remove(0);
+        if (locationToFollow == null ||
+                locationToFollow.size() == 0 ||
+                (locationToFollow.get(0).equals("all") && locationToFollow.size() == 1))
+            locationToFollow = new ArrayList<>();
+        if (tagToFollow == null ||
+                tagToFollow.size() == 0 ||
+                (tagToFollow.get(0).equals("all") && tagToFollow.size() == 1))
+            tagToFollow = new ArrayList<>();
+        if (userToFollow == null ||
+                userToFollow.size() == 0 ||
+                (userToFollow.get(0).equals("all") && userToFollow.size() == 1))
+            userToFollow = new ArrayList<>();
 
         //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
         //tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
@@ -152,7 +156,7 @@ public class TweetStub {
         consumer.seek(topicPartition, offset);
         consumer.poll(Duration.ofMillis(0));
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(5000);
+        ConsumerRecords<String,String> records = consumer.poll(1000);
         //Transforming data and filtering. (!Only by location)
         List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
         //Getting the new offset.
@@ -218,7 +222,7 @@ public class TweetStub {
 
                 });
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(5000);
+        ConsumerRecords<String,String> records = consumer.poll(1000);
         //Transforming data and filtering. (!Only by tag)
         List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
@@ -274,7 +278,7 @@ public class TweetStub {
                 });
         consumer.poll(0);
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(5000);
+        ConsumerRecords<String,String> records = consumer.poll(1000);
         //Transforming data and filtering. (!Only by mention)
         final List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {

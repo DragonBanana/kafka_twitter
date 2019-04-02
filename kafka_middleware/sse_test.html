@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Javascript External Script</title>
+    <script type = "text/javascript"/>
+    const url = 'ws://localhost:4567/ws';
+    const webSocket = new WebSocket(url);
+    function click() {
+    alert("fuck")
+    if (webSocket.readyState != WebSocket.OPEN) {
+    console.error("webSocket is not open: " + webSocket.readyState);
+    return;
+    }
+    var msg = document.getElementById("message").value;
+    webSocket.send(msg)
+    }
+    </script>
+    </head>
+    <form name="cart">
+        <input id="display" type="text" name="output" size="6" placeholder="message"/>
+        </form>
+        <button id="scart" onclick="webSocket.send(document.getElementById('display').value)">Add To Cart</button>
+        <body>
+        </body>
+
+        </html>
