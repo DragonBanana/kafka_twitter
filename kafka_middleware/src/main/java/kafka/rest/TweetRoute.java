@@ -68,14 +68,19 @@ public class TweetRoute {
                 return "User does not exist. Sign in if you want to get the tweets";
             }
 
+            List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
+            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&")));
+            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&")));
+
+            if (!new TweetStub().subscription(id, locations, tags, mentions)){
+                response.type("application/json");
+                response.status(404);
+                return "WebSocket connection is closed";
+            }
             response.type("application/json");
             response.status(200);
 
-            List<String> locations = Arrays.asList(request.splat()[0].split("&"));
-            List<String> tags = Arrays.asList(request.splat()[1].split("&"));
-            List<String> mentions = Arrays.asList(request.splat()[2].split("&"));
-
-            return new Gson().toJson(new TweetStub().findTweets(id, locations, tags, mentions));
+            return "Start streaming subscriptions";
             //TODO check error in filters
         });
 

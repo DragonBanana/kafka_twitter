@@ -296,5 +296,30 @@ public class TweetStub {
         return tweets;
     }
 
+    public boolean subscription(String id, List<String> locations, List<String> tags,List<String> mentions){
+        User user = Twitter.getTwitter().getUser(id);
+        //check if WebSocket connection is open
+        if(!user.getVirtualClient().isConnected()){
+            //TODO return error
+            return false;
+        }
+
+        //creation of subscriptions
+        SubscriptionStub subStub = user.getSubscriptionStub();
+        locations.forEach(l -> {
+            subStub.followLocation(l);
+        });
+        tags.forEach(t -> {
+            subStub.followTag(t);
+        });
+        mentions.forEach(m -> {
+            subStub.followUser(m);
+        });
+
+
+
+        return true;
+    }
+
 
 }
