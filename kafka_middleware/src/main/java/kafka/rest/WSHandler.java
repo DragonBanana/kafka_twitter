@@ -14,19 +14,22 @@ import java.util.Map;
 @WebSocket
 public class WSHandler {
 
-    private final Map<Session, String> map;
+    private static final Map<Session, String> map = new HashMap<>();
 
     public WSHandler() {
-        map = new HashMap<>();
     }
 
     @OnWebSocketConnect
-    public void onConnect(Session user) throws Exception {
-        System.out.println("user logged in with websocket");
+    public void onConnect(Session user) {
+        String id = user.getUpgradeRequest().getCookies().stream().filter(s -> s.getName().equals("id")).findAny().get().getValue();
+        System.out.println(id);
+        Twitter.getTwitter().getUser(id).setVirtualClient(new VirtualClient(user));
+        map.put(user, id);
     }
 
     @OnWebSocketMessage
     public void onMessage(Session user, String message) {
+        System.out.println(user.getUpgradeRequest().getCookies());
         if (user != null && user.isOpen() && message != null) {
             System.out.println("websocket received message: " + message);
             if (message.startsWith("id")) {
