@@ -2,12 +2,11 @@ package kafka.rest;
 
 import com.google.gson.Gson;
 import kafka.model.Twitter;
-import kafka.model.User;
 import kafka.utility.SubscriptionRequest;
 
 import java.util.Set;
 
-import static spark.Spark.*;
+import static spark.Spark.post;
 
 public class SubscriptionRoute {
 

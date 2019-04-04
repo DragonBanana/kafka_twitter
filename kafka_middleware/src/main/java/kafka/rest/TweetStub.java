@@ -8,13 +8,13 @@ import kafka.utility.ProducerFactory;
 import kafka.utility.TopicPartitionFactory;
 import kafka.utility.TweetFilter;
 import org.apache.commons.lang.StringUtils;
-import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
-import org.apache.kafka.common.protocol.types.Field;
 
 import java.time.Duration;
 import java.util.ArrayList;

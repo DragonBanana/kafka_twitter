@@ -6,6 +6,7 @@ import kafka.model.Tweet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,6 @@ import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertTrue;
 import static spark.Spark.*;
-import static spark.Spark.init;
 
 public class TweetRouteTest {
 

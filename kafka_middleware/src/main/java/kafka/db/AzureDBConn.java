@@ -1,9 +1,9 @@
 package kafka.db;
 
-// Include the following imports to use table APIs
-import com.microsoft.azure.storage.*;
-import com.microsoft.azure.storage.table.*;
-import com.microsoft.azure.storage.table.TableQuery.*;
+import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.table.CloudTable;
+import com.microsoft.azure.storage.table.CloudTableClient;
+import com.microsoft.azure.storage.table.TableOperation;
 import kafka.model.Offset;
 import kafka.model.OffsetKey;
 import kafka.model.OffsetValue;

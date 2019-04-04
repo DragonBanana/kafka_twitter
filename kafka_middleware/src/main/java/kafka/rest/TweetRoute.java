@@ -3,16 +3,13 @@ package kafka.rest;
 import com.google.gson.Gson;
 import kafka.model.Tweet;
 import kafka.model.Twitter;
-import spark.Response;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static spark.Spark.*;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
 public class TweetRoute {
 

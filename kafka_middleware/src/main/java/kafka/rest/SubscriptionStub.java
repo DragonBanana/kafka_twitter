@@ -5,7 +5,6 @@ import kafka.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Stub for the Subscription
