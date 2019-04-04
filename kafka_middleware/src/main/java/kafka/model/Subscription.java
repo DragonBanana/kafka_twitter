@@ -1,8 +1,7 @@
 package kafka.model;
 
-import com.google.gson.Gson;
-
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class used to keep track which tags, followedUsers and locations
@@ -35,6 +34,9 @@ public class Subscription {
         //TODO use username instead of id
         //A user can always see its own tweets
         followedUsers.add(user.getId());
+        tags = new HashSet<>();
+        locations = new HashSet<>();
+        followedUsers = new HashSet<>();
     }
 
     public Set<String> getTags() {

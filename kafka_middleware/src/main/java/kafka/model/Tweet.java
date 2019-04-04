@@ -1,5 +1,7 @@
 package kafka.model;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,5 +133,10 @@ public class Tweet {
                 t.getAuthor().equals(this.getAuthor()) &&
                 t.getContent().equals(this.getContent()) &&
                 t.getTimestamp().equals(this.getTimestamp());
+    }
+
+    public int hashCode() {
+        String tweet = new Gson().toJson(this);
+        return tweet.hashCode();
     }
 }

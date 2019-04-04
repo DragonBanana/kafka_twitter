@@ -6,7 +6,11 @@ import kafka.model.User;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SSERoutine implements Runnable {
 
@@ -50,6 +54,9 @@ public class SSERoutine implements Runnable {
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), Arrays.asList("all"), usersFollowed));
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
+
+                //filter duplicate tweets
+                tweets = tweets.stream().distinct().collect(Collectors.toList());
 
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 //todo VirtualClient.notify();

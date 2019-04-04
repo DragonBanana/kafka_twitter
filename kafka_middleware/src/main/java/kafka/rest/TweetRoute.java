@@ -32,7 +32,7 @@ public class TweetRoute {
             response.status(200);
             Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
             new TweetStub().save(tweet);
-            return "Tweet created" + new Gson().toJson(tweet);
+            return new Gson().toJson(tweet);
         });
 
         get("/tweets/*/*/*/latest", (request, response) -> {

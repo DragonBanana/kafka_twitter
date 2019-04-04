@@ -2,20 +2,14 @@ package kafka.rest;
 
 import com.google.gson.Gson;
 import kafka.model.Tweet;
-import kafka.utility.TweetFilter;
-import org.apache.commons.collections.list.SynchronizedList;
-import org.apache.velocity.util.ArrayListWrapper;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.*;
 
 public class TweetStubTest {
 
@@ -24,7 +18,7 @@ public class TweetStubTest {
     private String filter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         tweetList = new ArrayList<>();
         List<String> tags1 = new ArrayList<>();
         tags1.add("#tag1");
@@ -89,8 +83,8 @@ public class TweetStubTest {
             e.printStackTrace();
         }
         //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
-        tweetStub.findLatestByTags("luca", Arrays.asList("#swag"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
-        tweetStub.findLatestByLocations("luca", Arrays.asList("verona"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
+        tweetStub.findLatestByTags("luca", Collections.singletonList("#swag"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
+        tweetStub.findLatestByLocations("luca", Collections.singletonList("verona"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
         //System.out.println(tweetStub.findLatestByLocation("luca", "verona", "nofilters").size());
     }
 

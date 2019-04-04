@@ -4,6 +4,8 @@
 <head>
     <title>Javascript External Script</title>
     <script type = "text/javascript"/>
+    document.cookie="id=1; expires=Thu, 18 Dec 2020 12:00:00 UTC";
+    alert(document.cookie);
     const url = 'ws://localhost:4567/ws';
     const webSocket = new WebSocket(url);
     function click() {

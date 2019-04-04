@@ -1,6 +1,5 @@
 package kafka.rest;
 
-import com.google.gson.Gson;
 import kafka.model.Twitter;
 import kafka.model.VirtualClient;
 import org.eclipse.jetty.websocket.api.Session;

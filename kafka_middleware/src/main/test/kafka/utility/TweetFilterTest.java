@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,10 +14,10 @@ import static junit.framework.TestCase.assertTrue;
 
 public class TweetFilterTest {
 
-    List<Tweet> tweetList;
+    private List<Tweet> tweetList;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         tweetList = new ArrayList<>();
         List<String> tags1 = new ArrayList<>();
         tags1.add("#tag1");
@@ -65,7 +64,7 @@ public class TweetFilterTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 
 
