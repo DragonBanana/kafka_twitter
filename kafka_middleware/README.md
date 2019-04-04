@@ -43,7 +43,7 @@ Kafka Topics with replication factor > 1 are reliable.
 - **GET /tweets/{filter}/latest** retrieve tweets using a filter set. The filter is encoded as /{location}/{tag}/{mention}.
 - **POST /tweets/subscription/{filter}** creates a subscription. The server will notify the client whenever it receives a tweet that matches the filter.
 
-#### Filtering strategy
+### Filtering strategy
 **Single parameter filter**
 - {*Milan/all/all*} : returns all tweet which location is 'Milan'.
 - {*all/sunny_day/all*} : returns all tweet which tags contain 'sunny_day'.
@@ -59,12 +59,22 @@ Kafka Topics with replication factor > 1 are reliable.
 **Multiple parameter composed filter** 
 - {*Milan&Rome/sunny_day&cloudy_day/Mario_Rossi*} : returns all tweet which location is 'Milan' or 'Rome', tags contain 'sunny_day' or 'cloudy_day', and mentions contain 'Mario_Rossi'.
 
-## Exactly Once Semantic
-The application implements the EOS (Exactly Once Semantic). The application is using producer transactions to atomically write in Kafka so on the Consumer side, you have two options for reading transactional messages, expressed through the “isolation.level” consumer config ('read_committed' and 'read_uncommitted').
+### Subscription
+In order to subscribe to a location, a tag or a mention, the client has to open a websocket connection.
 
+## Other functionalities
+
+- **Offset management**
+The offset is managed manually. It is stored in an external database (an Azure Table Storage). The application assign an offset for each pair of {user} and {filter} used to search for data.
+
+- **Custom partitioner**
+The application uses 3 topic (location, tag and mention). The strategy used to assign a partition of a topic to a tweet has been customized. For the location topic it computes the hash of location attribute of a tweet in order to retrieve the partition, while for the other two, the last partition of a topic is reserved for tweet that has multiple tags or mentions.
+
+- **Exactly Once Semantic**
+The application implements the EOS (Exactly Once Semantic). The application is using producer transactions to atomically write in Kafka so on the Consumer side, you have two options for reading transactional messages, expressed through the “isolation.level” consumer config ('read_committed' and 'read_uncommitted').
 
 ## Authors
 
-* **Luca Ferrera** (https://github.com/BananaGod)
+* **Luca Ferrera** (https://github.com/lterrac)
 * **Davide Yi Xian Hu** (https://github.com/DragonBanana)
-* **Luca Terracciano** (https://github.com/SwagBanana)
+* **Luca Terracciano** (https://github.com/Luca-Ferrera)
