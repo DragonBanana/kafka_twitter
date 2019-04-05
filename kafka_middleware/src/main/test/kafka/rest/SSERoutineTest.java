@@ -8,8 +8,8 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+
+import static org.junit.Assert.*;
 
 public class SSERoutineTest {
 
@@ -96,13 +96,13 @@ public class SSERoutineTest {
         davide.setVirtualClient(new VirtualClient());
         alessio.setVirtualClient(new VirtualClient());
 
-        alessio.getSubscriptionStub().updatePoll((long) 300000);
+        alessio.getSubscriptionStub().updatePoll((long) 399999);
 
         sseRoutine.run();
 
         assertEquals( timestamp, (long) luca.getSubscriptionStub().lastPoll());
         assertEquals( timestamp, (long) davide.getSubscriptionStub().lastPoll());
-        assertEquals( 300000, (long) alessio.getSubscriptionStub().lastPoll() );
+        assertEquals( 399999, (long) alessio.getSubscriptionStub().lastPoll() );
         assertNotEquals( timestamp, (long) alessio.getSubscriptionStub().lastPoll());
 
 

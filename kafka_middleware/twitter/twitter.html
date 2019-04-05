@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="twitter.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Twitter</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle mr-2 ml-2" href="#" id="navbarDropdown" role="button"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Search Tweets
+          </a>
+          <div class="dropdown-menu" style="width: 20vw;;" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item">
+
+              <div class="input-group m-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" aria-label="Checkbox for following text input">
+                  </div>
+                </div>
+                <input type="text" class="form-control" placeholder="Locations" aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+            <a class="dropdown-item">
+
+              <div class="input-group m-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" aria-label="Checkbox for following text input">
+                  </div>
+                </div>
+                <input type="text" class="form-control" placeholder="Tags" aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+            <a class="dropdown-item">
+
+              <div class="input-group m-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" aria-label="Checkbox for following text input">
+                  </div>
+                </div>
+                <input type="text" class="form-control" placeholder="Mentions" aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item">
+
+              <!-- Button trigger modal -->
+              <div class="center-block text-center">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#getTweets">Get
+                  Tweets</button>
+              </div>
+            </a>
+          </div>
+        </li>
+
+        <li class="nav-item  mr-2 ml-2">
+          <div class="center-block text-center">
+            <button type="button" class="btn btn-primary">Stream Tweets</button>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+  </nav>
+
+                <!-- Modal -->
+                <div class="modal fade" id="getTweets" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      ...
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+  <div class="container mt-4" style="border-radius: 15px; background-color: #ffffff">
+    <div class="row align-items-center">
+      <div class="col-12 mt-2">
+        <div class="input-group">
+          <textarea class="form-control" placeholder="Write your tweet" aria-label="With textarea"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 m-2">
+        <div class="text-right mr-2">
+          <button type="button" class="btn btn-primary">Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-12">
+        <ul class="timeline">
+          <li>
+            <div class="timeline-badge"><i class="glyphicon glyphicon-check"></i></div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+                <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> 11 hours ago via
+                    Twitter</small>
+                </p>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois
+                  divoltis
+                  porris,
+                  paradis.</p>
+              </div>
+            </div>
+          </li>
+          <li class="timeline-inverted">
+            <div class="timeline-badge warning"><i class="glyphicon glyphicon-credit-card"></i></div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois
+                  divoltis
+                  porris,
+                  paradis.</p>
+                <p>Suco de cevadiss, é um leite divinis, qui tem lupuliz, matis, aguis e fermentis. Interagi no
+                  mé,
+                  cursus
+                  quis, vehicula ac nisi. </p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="timeline-badge danger"><i class="glyphicon glyphicon-credit-card"></i></div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. </p>
+              </div>
+            </div>
+          </li>
+          <li class="timeline-inverted">
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois
+                  divoltis
+                  porris,
+                  paradis. Paisis, filhis, espiritis santis.</p>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="timeline-badge info"><i class="glyphicon glyphicon-floppy-disk"></i></div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois
+                  divoltis
+                  porris,
+                  paradis. Paisis, filhis, espiritis santis.</p>
+                <hr>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <i class="glyphicon glyphicon-cog"></i> <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois
+                  divoltis
+                  porris,
+                  paradis. Paisis, filhis, espiritis santis.</p>
+              </div>
+            </div>
+          </li>
+          <li class="timeline-inverted">
+            <div class="timeline-badge success"><i class="glyphicon glyphicon-thumbs-up"></i></div>
+            <div class="timeline-panel">
+              <div class="timeline-heading">
+                <h4 class="timeline-title">Mussum ipsum cacilds</h4>
+              </div>
+              <div class="timeline-body">
+                <p>Mussum ipsum cacilds, vidis litro abertis. Consetis adipiscings elitis. Pra lá , depois
+                  divoltis
+                  porris,
+                  paradis. Paisis, filhis, espiritis santis.</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+  <script src="twitter.js"></script>
+</body>
+
+</html>
