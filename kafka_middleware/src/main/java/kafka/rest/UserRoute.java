@@ -27,14 +27,15 @@ public class UserRoute {
             User user;
             Twitter twitter = Twitter.getTwitter();
             response.cookie("id", id);
+            response.header("Access-Control-Allow-Origin", "*");
 
             if (twitter.createNewUser(id)) {
                 response.status(200);
                 return "{\"type\" : \"success\", \"message\" : \"user with " + id + " created}\"}";
             }
             else {
-                response.status(400);
-                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
+                response.status(200);
+                return "{\"type\" : \"success\", \"message\" : \"user with " + id + " logged}\"}";
             }
         });
 

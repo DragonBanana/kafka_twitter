@@ -51,6 +51,7 @@ public class SubscriptionRoute {
             }
 
             response.status(200);
+            response.header("Access-Control-Allow-Origin", "*");
             //return "Subscriptions created";
             return new Gson().toJson(subscriptionStub);
         });
