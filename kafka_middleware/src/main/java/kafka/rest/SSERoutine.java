@@ -47,13 +47,9 @@ public class SSERoutine implements Runnable {
                 //List<Tweet> tweets = tweetStub.findTweets(user.getId(), locationsFollowed, tagsFollowed, usersFollowed);
 
                 List<Tweet> tweets = new ArrayList<>();
-                LoggerFactory.getLogger(TwitterRest.class).info(locationsFollowed.toString());
                 tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Arrays.asList("all"), Arrays.asList("all")));
-                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), tagsFollowed, Arrays.asList("all")));
-                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), Arrays.asList("all"), usersFollowed));
-                LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
 
                 //filter duplicate tweets
                 tweets = tweets.stream().distinct().collect(Collectors.toList());
@@ -69,12 +65,9 @@ public class SSERoutine implements Runnable {
                 users.removeFirst();
                 users.addLast(user);
             } else {
-                users.addFirst(user);
                 stop = true;
             }
             iterations++;
         }
-        LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
-        System.out.println("users size " + users.size());
     }
 }

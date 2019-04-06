@@ -8,8 +8,8 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class SSERoutineTest {
 

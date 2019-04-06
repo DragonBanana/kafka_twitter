@@ -21,7 +21,6 @@ public class UserRoute {
         post("/users/:id", (request, response) -> {
 
             response.type("application/json");
-            response.status(200);
 
             String id = request.params(":id");
 
@@ -30,10 +29,12 @@ public class UserRoute {
             response.cookie("id", id);
 
             if (twitter.createNewUser(id)) {
-                return "New user created with id: " + id;
+                response.status(200);
+                return "{\"type\" : \"success\", \"message\" : \"user with " + id + " created}\"}";
             }
             else {
-                return "User already registered with id: " + id;
+                response.status(400);
+                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
         });
 

@@ -111,6 +111,8 @@ public class Tweet {
     public List<String> getFilters() {
         List<String> result = new ArrayList<>();
 
+        System.out.println("getFilters" + new Gson().toJson(this));
+
         if (mentions.size() > 0)
             result.add(Topic.MENTION);
 
@@ -123,9 +125,7 @@ public class Tweet {
     }
 
     public boolean equals(Tweet t) {
-        return t.getFilters().containsAll(this.getFilters()) &&
-                this.getFilters().containsAll(t.getFilters()) &&
-                t.getTags().containsAll(this.getTags()) &&
+        return t.getTags().containsAll(this.getTags()) &&
                 this.getTags().containsAll(t.getTags()) &&
                 t.getMentions().containsAll(this.getMentions()) &&
                 this.getMentions().containsAll(t.getMentions()) &&

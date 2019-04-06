@@ -156,7 +156,7 @@ public class TweetStub {
         consumer.seek(topicPartition, offset);
         consumer.poll(Duration.ofMillis(0));
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(1000);
+        ConsumerRecords<String,String> records = consumer.poll(10000);
         //Transforming data and filtering. (!Only by location)
         List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
         //Getting the new offset.
@@ -222,7 +222,7 @@ public class TweetStub {
 
                 });
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(1000);
+        ConsumerRecords<String,String> records = consumer.poll(10000);
         //Transforming data and filtering. (!Only by tag)
         List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {
@@ -278,7 +278,7 @@ public class TweetStub {
                 });
         consumer.poll(0);
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(1000);
+        ConsumerRecords<String,String> records = consumer.poll(10000);
         //Transforming data and filtering. (!Only by mention)
         final List<Tweet> tweets = new ArrayList();
         records.forEach(record -> {

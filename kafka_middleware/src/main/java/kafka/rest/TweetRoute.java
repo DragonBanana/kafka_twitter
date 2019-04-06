@@ -3,6 +3,7 @@ package kafka.rest;
 import com.google.gson.Gson;
 import kafka.model.Tweet;
 import kafka.model.Twitter;
+import kafka.utility.TweetValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,18 +19,25 @@ public class TweetRoute {
 
         post("/tweets", (request, response) -> {
 
+            response.type("application/json");
             String id = request.cookie("id");
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {
-                response.status(404);
-                return "User does not exist. Sign in if you want to post a tweet";
+                response.status(400);
+                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
 
-            response.type("application/json");
-            response.status(200);
             Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
-            new TweetStub().save(tweet);
-            return new Gson().toJson(tweet);
+            if (TweetValidator.isValid(tweet)) {
+                response.status(200);
+                TweetValidator.toStandardTweet(tweet);
+                new TweetStub().save(tweet);
+                return new Gson().toJson(tweet);
+            }else{
+                response.status(400);
+                return "{\"type\" : \"error\", \"message\" : \"tweet is not well formatted\"}";
+            }
+
         });
 
         get("/tweets/*/*/*/latest", (request, response) -> {
@@ -40,8 +48,8 @@ public class TweetRoute {
 
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {
-                response.status(404);
-                return "User does not exist. Sign in if you want to get the tweets";
+                response.status(400);
+                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
 
             response.type("application/json");
@@ -61,8 +69,8 @@ public class TweetRoute {
 
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {
-                response.status(404);
-                return "User does not exist. Sign in if you want to get the tweets";
+                response.status(400);
+                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
 
             List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
@@ -71,7 +79,7 @@ public class TweetRoute {
 
             if (!new TweetStub().subscription(id, locations, tags, mentions)){
                 response.type("application/json");
-                response.status(404);
+                response.status(400);
                 return "WebSocket connection is closed";
             }
             response.type("application/json");
