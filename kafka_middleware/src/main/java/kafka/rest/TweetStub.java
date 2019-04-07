@@ -306,15 +306,9 @@ public class TweetStub {
 
         //creation of subscriptions
         SubscriptionStub subStub = user.getSubscriptionStub();
-        locations.forEach(l -> {
-            subStub.followLocation(l);
-        });
-        tags.forEach(t -> {
-            subStub.followTag(t);
-        });
-        mentions.forEach(m -> {
-            subStub.followUser(m);
-        });
+        locations.forEach(subStub::followLocation);
+        tags.forEach(subStub::followTag);
+        mentions.forEach(subStub::followUser);
 
 
 

@@ -1,24 +1,36 @@
 $(document).ready(function () {
 
+    setup = function () {
+        console.log("executing ajaxSetup()");
+        $.ajaxSetup({
+            dataType: 'json',
+            accept: 'application/json',
+            credentials: 'same-origin',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true
+        });
+    };
+
     //Register/login to twitter ------> hard coded
     register = function () {
         console.log("send the cookie");
-        $.post("http://localhost:4567/api/users/gianni", function(res) {
+        $.post("http://localhost:4567/api/users/gianni", 'json').then(res => {
             
-            //ERROR: res is undefined
-            console.log(res + " " +JSON.parse(res));
+            id = res.message.split("=")[0];
+            value = res.message.split("=")[1];
+            console.log("the cookie: " + document.cookie);
         });
-        console.log("the cookie: " + document.cookie );
-  
-        //Hard coded to set the correct id
-        $.cookie('id', 'luca');
-    } 
+        setup();
+        $.cookie("id", "gianni" );
+    }
 
 
 
     //Triggered by Get Tweets
     loadSearchedTweets = function () {
-        
+
         tags = [];
         locations = [];
         followedUsers = [];
@@ -49,7 +61,7 @@ $(document).ready(function () {
         path = locations + "/" + tags + "/" + followedUsers + "/latest";
 
         //REST API
-        $.getJSON("http://localhost:4567/api/tweets/" + path).then(res => {
+        $.get("http://localhost:4567/api/tweets/" + path).then(res => {
             console.log("tweets: " + JSON.parse(res));
 
             //Append new data to the modal
@@ -61,13 +73,13 @@ $(document).ready(function () {
         });
     }
 
-    streamTweets = function() {
-    
+    streamTweets = function () {
+
         //Api for tweet streaming
     }
 
     subscribe = function () {
-        
+
         tags = [];
         locations = [];
         followedUsers = [];
@@ -96,10 +108,10 @@ $(document).ready(function () {
     postTweet = function () {
         var tweetText = $("tweetText").val();
         //Get the author from the cookie
-        var author = document.cookie.split("=")[1];
+        var author = $.cookie('id');
         //Set timestamp (optional)
         var timestamp = Date.now();
-        
+
         //TODO Add in html field location
         locationPost = ";"
 
@@ -114,18 +126,18 @@ $(document).ready(function () {
         });
 
         var tweet = {
-            "author" : author,
+            "author": author,
             "content": tweetText,
-            "timestamp":timestamp,
+            "timestamp": timestamp,
             "location": locationPost,
             "tags": tagsPost,
-            "mentions":mentionsPost
+            "mentions": mentionsPost
         }
         console.log(JSON.stringify(tweet));
 
         //REST Api to post the tweet
-        $.post("http://localhost:4567/api/tweets",JSON.stringify(tweet), 'json').then( res => {
-            if(res == 200) {
+        $.post("http://localhost:4567/api/tweets", JSON.stringify(tweet), 'json').then(res => {
+            if (res == 200) {
                 //Append the new tweet to the timeline
                 console.log("Ok post");
             } else {

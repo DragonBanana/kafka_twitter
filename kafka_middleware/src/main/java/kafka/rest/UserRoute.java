@@ -1,7 +1,6 @@
 package kafka.rest;
 
 import kafka.model.Twitter;
-import kafka.model.User;
 
 import static spark.Spark.post;
 
@@ -21,21 +20,21 @@ public class UserRoute {
         post("/users/:id", (request, response) -> {
 
             response.type("application/json");
-
             String id = request.params(":id");
 
-            User user;
             Twitter twitter = Twitter.getTwitter();
-            response.cookie("id", id);
-            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"5500");
+            response.header("Access-Control-Allow-Credentials", "true");
+            response.header("Set-Cookie", "id="+ id);
+//            response.cookie("id", id, -1, false, false);
 
             if (twitter.createNewUser(id)) {
                 response.status(200);
-                return "{\"type\" : \"success\", \"message\" : \"user with " + id + " created}\"}";
+                return "{\"type\" : \"success\", \"message\" : \"id="+id+"\"}";
             }
             else {
                 response.status(200);
-                return "{\"type\" : \"success\", \"message\" : \"user with " + id + " logged}\"}";
+                return "{\"type\" : \"success\", \"message\" : \"id=" + id + "\"}";
             }
         });
 

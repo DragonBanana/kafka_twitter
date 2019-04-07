@@ -19,6 +19,7 @@ public class TweetRoute {
 
         post("/tweets", (request, response) -> {
 
+            response.header("Access-Control-Allow-Origin", "*");
             response.type("application/json");
             String id = request.cookie("id");
             //Search for the user in the data structure
@@ -43,16 +44,18 @@ public class TweetRoute {
         get("/tweets/*/*/*/latest", (request, response) -> {
 
             System.out.println("Wow" + Twitter.getTwitter().getUsers().size());
+            response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"5500");
+            response.header("Access-Control-Allow-Credentials", "true");
 
             String id = request.cookie("id");
+            response.type("application/json");
 
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {
                 response.status(400);
-                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
+                return "{\"type\" : \"error\", \"message\" : \"user does not exist with id "+id+", sign in if you want to post a tweet\"}";
             }
 
-            response.type("application/json");
             response.status(200);
 
             List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
@@ -66,6 +69,7 @@ public class TweetRoute {
         post("/tweets/subscription/*/*/*", (request, response) -> {
 
             String id = request.cookie("id");
+            response.header("Access-Control-Allow-Origin", "*");
 
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {
