@@ -18,8 +18,9 @@ public class TweetRoute {
 
 
         post("/tweets", (request, response) -> {
-
-            response.header("Access-Control-Allow-Origin", "*");
+            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567");
+            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
+            response.header("Access-Control-Allow-Credentials", "true");
             response.type("application/json");
             String id = request.cookie("id");
             //Search for the user in the data structure
@@ -43,8 +44,8 @@ public class TweetRoute {
 
         get("/tweets/*/*/*/latest", (request, response) -> {
 
-            System.out.println("Wow" + Twitter.getTwitter().getUsers().size());
-            response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"5500");
+            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
+            //response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Allow-Credentials", "true");
 
             String id = request.cookie("id");
@@ -69,7 +70,7 @@ public class TweetRoute {
         post("/tweets/subscription/*/*/*", (request, response) -> {
 
             String id = request.cookie("id");
-            response.header("Access-Control-Allow-Origin", "*");
+            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
 
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {

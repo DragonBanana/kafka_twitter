@@ -1,4 +1,4 @@
-# Kafka Twitter
+# KAFKA TWITTER
 
 ## Assignment
 
@@ -61,7 +61,7 @@ Kafka Topics with replication factor > 1 are reliable.
 
 ### Subscription
 In order to subscribe to a location, a tag or a mention, the client has to open a websocket connection. Parameters in the filter string are not correlated, each parameter in the filter is interpreted as a single subscription.
-So {*Milan/sunny_day/Mario_Rossi*} is a subscription to three topics (location : 'Milan', tag : 'sunny_day' and mention : 'Mario_Rossi')
+So {*Milan/sunny_day/Mario_Rossi*} is a subscription to three independent topics (location : 'Milan', tag : 'sunny_day' and mention : 'Mario_Rossi')
 
 ## Other functionalities
 

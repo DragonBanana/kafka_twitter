@@ -23,7 +23,7 @@ $(document).ready(function () {
             console.log("the cookie: " + document.cookie);
         });
         setup();
-        $.cookie("id", "gianni" );
+        $.cookie("id", "gianni", {path:"/"} );
     }
 
 
