@@ -99,15 +99,15 @@ public class TweetStubTest {
         });
         List<Tweet> tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc1"), filter);
         assertTrue(tweets.size() > 0);
-        assertTrue(tweets.get(0).equals(tweetList.get(0)));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
 
         tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc2"), filter);
         assertTrue(tweets.size() > 0);
-        assertTrue(tweets.get(0).equals(tweetList.get(1)));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
 
         tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc3"), filter);
         assertTrue(tweets.size() > 0);
-        assertTrue(tweets.get(0).equals(tweetList.get(2)));
+        assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
     }
 
     @Test

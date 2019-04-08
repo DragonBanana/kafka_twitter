@@ -3,6 +3,14 @@ body {
   background-image: url("twitterbackground.jpg");
 }
 
+.navbar {
+  padding: .5rem 2.5rem;
+}
+
+li {
+  margin-right: 2.5rem;
+}
+
 .timeline {
   list-style: none;
   padding: 20px 0 20px;

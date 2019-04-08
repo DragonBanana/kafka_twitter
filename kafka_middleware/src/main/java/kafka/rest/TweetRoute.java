@@ -70,7 +70,7 @@ public class TweetRoute {
         post("/tweets/subscription/*/*/*", (request, response) -> {
 
             String id = request.cookie("id");
-            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
+            response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
 
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {

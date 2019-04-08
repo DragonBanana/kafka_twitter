@@ -3,9 +3,9 @@
 
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="twitter.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="twitter.css">
     <script
     src="https://code.jquery.com/jquery-3.3.1.min.js"
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -33,9 +33,65 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle mr-2 ml-2" href="#" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Subscribe
+          </a>
+          <div class="dropdown-menu" style="width: 18vw;;" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item">
+
+              <div class="input-group m-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" name="Locations" aria-label="Checkbox for following text input">
+                  </div>
+                </div>
+                <input type="text" id="locationsSubscribe" class="form-control" placeholder="Locations"
+                  aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+            <a class="dropdown-item">
+
+              <div class="input-group m-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" aria-label="Checkbox for following text input" name="Tags">
+                  </div>
+                </div>
+                <input type="text" id="tagsSubscribe" class="form-control" placeholder="Tags"
+                  aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+            <a class="dropdown-item">
+
+              <div class="input-group m-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" name="Mentions" aria-label="Checkbox for following text input">
+                  </div>
+                </div>
+                <input type="text" id="mentionsSubscribe" class="form-control" placeholder="Mentions"
+                  aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item">
+
+              <!-- Button trigger modal -->
+              <div class="center-block text-center">
+                <button type="button" class="btn btn-primary" onclick="subscribeTweets()">Subscribe</button>
+              </div>
+            </a>
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle mr-2 ml-2" href="#" id="navbarDropdown" role="button"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Search Tweets
           </a>
-          <div class="dropdown-menu" style="width: 20vw;;" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" style="width: 18vw;;" aria-labelledby="navbarDropdown">
             <a class="dropdown-item">
 
               <div class="input-group m-2">
@@ -85,6 +141,8 @@
             </a>
           </div>
         </li>
+
+
 
         <li class="nav-item  mr-2 ml-2">
           <div class="center-block text-center">

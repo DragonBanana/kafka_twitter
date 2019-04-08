@@ -23,7 +23,7 @@ public class UserRoute {
             String id = request.params(":id");
 
             Twitter twitter = Twitter.getTwitter();
-            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
+            response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
             //response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Allow-Credentials", "true");
             //response.header("Set-Cookie", "id="+ id  + "; path=\"/tuamadre\"");

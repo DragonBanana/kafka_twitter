@@ -74,15 +74,57 @@ $(document).ready(function () {
             var jsonData = res;
             console.log(res);
             $.each(res, function(index, element) {
-                console.log(index + element);
-                console.log(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions))
                 $("#timeline").prepend(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions));
             });
         });
     }
 
-    streamTweets = function () {
+    //Triggered by Get Tweets
+    subscribeTweets = function () {
 
+        tags = [];
+        locations = [];
+        followedUsers = [];
+
+        //If the box is checked split the filters deleting the spaces and
+        //join them into a unique string ( "&" is the separator), otherwise use "all"
+        if ($("input[name='Locations']:checked").val()) {
+            locations = $("#locationsSubscribe").val().split(" ").join("&");
+        } else {
+            locations = "all";
+        }
+        if ($("input[name='Tags']:checked").val()) {
+            tags = $("#tagsSubscribe").val().split(" ").join("&");
+        } else {
+            tags = "all";
+        }
+        if ($("input[name='Mentions']:checked").val()) {
+            followedUsers = $("#mentionsSubscribe").val().split(" ").join("&");
+        } else {
+            followedUsers = "all";
+        }
+
+        console.log(locations);
+        console.log(tags);
+        console.log(followedUsers);
+
+        //Create the path for the API
+        path = locations + "/" + tags + "/" + followedUsers;
+
+        //REST API
+        $.post("http://localhost:4567/api/tweets/subscription/" + path).then(res => {
+            console.log(res);
+        });
+    }
+
+
+    streamTweets = function () {
+        const url = 'ws://localhost:4567/ws';
+        const webSocket = new WebSocket(url);
+        webSocket.onmessage = function (event) {
+            var tweet = JSON.parse(event.data);
+            $("#timeline").prepend(createTweet(tweet.Author, tweet.timestamp, tweet.content, tweet.location, tweet.tags, tweet.mentions));
+          }
         //Api for tweet streaming
     }
 
