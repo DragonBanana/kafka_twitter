@@ -17,13 +17,13 @@ $(document).ready(function () {
     register = function () {
         console.log("send the cookie");
         $.post("http://localhost:4567/api/users/gianni", 'json').then(res => {
-            
+
             id = res.message.split("=")[0];
             value = res.message.split("=")[1];
             console.log("the cookie: " + document.cookie);
         });
         setup();
-        $.cookie("id", "gianni", {path:"/"} );
+        $.cookie("id", "gianni", { path: "/" });
     }
 
 
@@ -62,14 +62,22 @@ $(document).ready(function () {
 
         //REST API
         $.get("http://localhost:4567/api/tweets/" + path).then(res => {
-            console.log("tweets: " + JSON.parse(res));
+            //console.log("tweets: " + JSON.parse(res));
 
             //Append new data to the modal
-            $("#getTweetsBody").append(JSON.parse(res));
+            //$("#getTweetsBody").append(JSON.parse(res));
 
             //Show the modal
-            $("#getTweets").modal("show");
+            //$("#getTweets").modal("show");
 
+            //Append new data to the modal
+            var jsonData = res;
+            console.log(res);
+            $.each(res, function(index, element) {
+                console.log(index + element);
+                console.log(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions))
+                $("#timeline").prepend(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions));
+            });
         });
     }
 
@@ -149,5 +157,22 @@ $(document).ready(function () {
     $(function () {
         register();
     });
+
+    function createTweet(author, timestamp, content, location, tags, mentions) {
+        return '<li> \
+        <div class="timeline-badge"><i class="glyphicon glyphicon-check"></i></div> \
+        <div class="timeline-panel"> \
+          <div class="timeline-heading"> \
+            <h4 class="timeline-title">' + author + '</h4> \
+            <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i>' + timestamp + ' at ' + location + '</small> \
+            </p> \
+          </div> \
+          <div class="timeline-body"> \
+            <p>' + content + '</p> \
+          </div> \
+        </div> \
+      </li>'
+    };
+
 
 });

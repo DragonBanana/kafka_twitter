@@ -36,7 +36,7 @@ public class UserRoute {
             }
             else {
                 response.status(400);
-                return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
+                return "{\"type\" : \"error\", \"message\" : \"user already exist\"}";
             }
         });
 
