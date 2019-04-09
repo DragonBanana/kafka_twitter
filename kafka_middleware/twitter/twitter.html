@@ -16,7 +16,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
   </script>
-  <script src="carhartl-jquery-cookie-v1.4.1-0-g7f88a4e/carhartl-jquery-cookie-92b7715/jquery.cookie.js""></script>
+  <script src="carhartl-jquery-cookie-v1.4.1-0-g7f88a4e/carhartl-jquery-cookie-92b7715/jquery.cookie.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 
@@ -142,13 +142,39 @@
           </div>
         </li>
 
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle mr-2 ml-2" href="#" id="login" role="button"
+             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Login
+          </a>
+          <div class="dropdown-menu" style="width: 18vw;;" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item">
 
+              <div class="input-group m-2">
+                <input type="text" id="usernameField" class="form-control" placeholder="Username"
+                       aria-label="Text input with checkbox">
+              </div>
+
+            </a>
+
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item">
+
+              <!-- Button trigger modal -->
+              <div class="center-block text-center">
+                <button type="button" class="btn btn-primary" onclick="register()">Login</button>
+              </div>
+            </a>
+          </div>
+        </li>
 
         <li class="nav-item  mr-2 ml-2">
           <div class="center-block text-center">
             <button type="button" class="btn btn-primary" onclick="streamTweets()">Stream Tweets</button>
           </div>
         </li>
+
+
 
       </ul>
     </div>
