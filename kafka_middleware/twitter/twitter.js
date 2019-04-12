@@ -112,6 +112,15 @@ $(document).ready(function () {
         if (!LoggedIn) {
             window.alert("Login first!")
         } else {
+
+        }
+    }
+
+    //Triggered by Get Tweets
+    subscribeTweets = function () {
+        if (!LoggedIn) {
+            window.alert("Login first!")
+        } else {
             const url = 'ws://localhost:4567/ws';
             var webSocket
             console.log(webSocket);
@@ -123,15 +132,7 @@ $(document).ready(function () {
                 }
             }
             //Api for tweet streaming
-        }
-    }
 
-    //Triggered by Get Tweets
-    subscribeTweets = function () {
-        if (!LoggedIn) {
-            window.alert("Login first!")
-        } else {
-            streamTweets();
 
             tags = [];
             locations = [];
@@ -171,10 +172,15 @@ $(document).ready(function () {
             //Create the path for the API
             path = locations + "/" + tags + "/" + followedUsers;
 
+
+            webSocket.onopen = function () {
+                $.post("http://localhost:4567/api/tweets/subscription/" + path).then(res => {
+                    console.log(res);
+                });
+            }
+
             //REST API
-            $.post("http://localhost:4567/api/tweets/subscription/" + path).then(res => {
-                console.log(res);
-            });
+
         }
     }
 
