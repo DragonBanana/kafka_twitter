@@ -10,7 +10,7 @@ public class Tweet {
     /**
      * The author of the tweet.
      */
-    private String Author;
+    private String author;
 
     /**
      * The content of the tweet.
@@ -47,7 +47,7 @@ public class Tweet {
      * @param mentions the mentions of the tweet.
      */
     public Tweet(String author, String content, String timestamp, String location, List<String> tags, List<String> mentions) {
-        Author = author;
+        this.author = author;
         this.content = content;
         this.timestamp = timestamp;
         this.location = location;
@@ -60,7 +60,7 @@ public class Tweet {
      * @return the author of the tweet.
      */
     public String getAuthor() {
-        return Author;
+        return author;
     }
 
     /**

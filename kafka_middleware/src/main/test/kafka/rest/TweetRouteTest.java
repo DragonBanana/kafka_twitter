@@ -56,7 +56,7 @@ public class TweetRouteTest {
         when().
                 post("http://localhost:4567/api/users/5").
                 then().
-                statusCode(400);
+                statusCode(200);
     }
 
     @Test

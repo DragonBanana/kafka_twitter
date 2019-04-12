@@ -29,6 +29,7 @@ public class TweetRoute {
                 return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
 
+            System.out.println(request.body());
             Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
             if (TweetValidator.isValid(tweet)) {
                 response.status(200);

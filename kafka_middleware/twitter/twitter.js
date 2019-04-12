@@ -84,7 +84,7 @@ $(document).ready(function () {
 
                 //Append new data to the modal
                 $.each(res, function (index, element) {
-                    $("#getTweetsBody").prepend(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions));
+                    $("#getTweetsBody").prepend(createTweet(element.author, element.timestamp, element.content, element.location, element.tags, element.mentions));
                 });
 
                 //Show the modal
@@ -93,7 +93,7 @@ $(document).ready(function () {
                 //Append new data to the modal
                 console.log(res);
                 $.each(res, function (index, element) {
-                    $("#timeline").prepend(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions));
+                    $("#timeline").prepend(createTweet(element.author, element.timestamp, element.content, element.location, element.tags, element.mentions));
                 });
             });
         }
@@ -159,7 +159,7 @@ $(document).ready(function () {
             const webSocket = new WebSocket(url);
             webSocket.onmessage = function (event) {
                 var tweet = JSON.parse(event.data);
-                $("#timeline").prepend(createTweet(tweet.Author, tweet.timestamp, tweet.content, tweet.location, tweet.tags, tweet.mentions));
+                $("#timeline").prepend(createTweet(tweet.author, tweet.timestamp, tweet.content, tweet.location, tweet.tags, tweet.mentions));
             }
             //Api for tweet streaming
         }
@@ -202,7 +202,7 @@ $(document).ready(function () {
         } else {
             var tweetText = $("#tweetText").val();
             //Get the author from the cookie
-            var author = $.cookie('id');
+            var author = username;
             //Set timestamp (optional)
             var timestamp = Date.now();
 
@@ -242,13 +242,12 @@ $(document).ready(function () {
 
             //REST Api to post the tweet
             $.post("http://localhost:4567/api/tweets", JSON.stringify(tweet), 'json').then(res => {
-                if (res == 200) {
-                    //Append the new tweet to the timeline
                     console.log("Ok post");
-                } else {
+            })
+                .fail(function() {
                     console.log("Something went wrong post")
-                }
-            });
+                })
+            ;
         }
     };
 
