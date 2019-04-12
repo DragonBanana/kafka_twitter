@@ -7,7 +7,12 @@
     document.cookie="id=1; expires=Thu, 18 Dec 2020 12:00:00 UTC";
     alert(document.cookie);
     const url = 'ws://localhost:4567/ws';
-    const webSocket = new WebSocket(url);
+    var webSocket;
+    if(typeof webSocket === "undefined")  {
+        alert(webSocket)
+    }
+        alert(webSocket)
+    webSocket = new WebSocket(url);
     function click() {
     alert("fuck")
     if (webSocket.readyState != WebSocket.OPEN) {

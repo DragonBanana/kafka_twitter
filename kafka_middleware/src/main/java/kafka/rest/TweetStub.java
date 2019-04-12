@@ -155,10 +155,17 @@ public class TweetStub {
         //Moving the offset.
         consumer.seek(topicPartition, offset);
         consumer.poll(Duration.ofMillis(0));
+        List<Tweet> ts = new ArrayList<>();
+        List<Tweet> tweets = new ArrayList<>();
         //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(1000);
-        //Transforming data and filtering. (!Only by location)
-        List<Tweet> tweets = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
+        do {
+            ts.clear();
+            ConsumerRecords<String, String> records = consumer.poll(1000);
+            //Transforming data and filtering. (!Only by location)
+            ts = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
+            tweets.addAll(ts);
+        }while(ts.size() > 0);
+
         //Getting the new offset.
         offset = consumer.position(topicPartition);
         //Saving the new offset for EOS.
@@ -221,15 +228,20 @@ public class TweetStub {
                     consumer.seek(topicPartition, offset);
 
                 });
-        //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(1000);
-        //Transforming data and filtering. (!Only by tag)
+        List<Tweet> ts = new ArrayList();
         List<Tweet> tweets = new ArrayList();
-        records.forEach(record -> {
-            Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-            if (t.getTags().stream().anyMatch(tags::contains))
-                tweets.add(t);
-        });
+        do{
+            ts.clear();
+            //Polling the data.
+            ConsumerRecords<String, String> records = consumer.poll(1000);
+            //Transforming data and filtering. (!Only by tag)
+            records.forEach(record -> {
+                Tweet t = new Gson().fromJson(record.value(), Tweet.class);
+                if (t.getTags().stream().anyMatch(tags::contains))
+                    ts.add(t);
+            });
+            tweets.addAll(ts);
+        }while(ts.size() > 0);
         topicPartitions.forEach(topicPartition -> {
             //Getting the new offset.
             long offset = consumer.position(topicPartition);
@@ -276,16 +288,21 @@ public class TweetStub {
                     //Moving the offset.
                     consumer.seek(topicPartition, offset);
                 });
-        consumer.poll(0);
-        //Polling the data.
-        ConsumerRecords<String,String> records = consumer.poll(1000);
-        //Transforming data and filtering. (!Only by mention)
-        final List<Tweet> tweets = new ArrayList();
-        records.forEach(record -> {
-            Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-            if (t.getMentions().stream().anyMatch(mentions::contains))
-                tweets.add(t);
-        });
+        List<Tweet> tweets = new ArrayList();
+        List<Tweet> ts = new ArrayList();
+        do{
+            ts.clear();
+            //Polling the data.
+            ConsumerRecords<String, String> records = consumer.poll(1000);
+            //Transforming data and filtering. (!Only by tag)
+            records.forEach(record -> {
+                Tweet t = new Gson().fromJson(record.value(), Tweet.class);
+                if (t.getMentions().stream().anyMatch(mentions::contains))
+                    ts.add(t);
+            });
+            System.out.println(ts.size());
+            tweets.addAll(ts);
+        }while(ts.size() > 0);
         topicPartitions.forEach(topicPartition -> {
             //Getting the new offset.
             long offset = consumer.position(topicPartition);
@@ -297,6 +314,20 @@ public class TweetStub {
     }
 
     public boolean subscription(String id, List<String> locations, List<String> tags,List<String> mentions){
+
+        if (locations == null ||
+                locations.size() == 0 ||
+                (locations.get(0).equals("all") && locations.size() == 1))
+            locations = new ArrayList<>();
+        if (tags == null ||
+                tags.size() == 0 ||
+                (tags.get(0).equals("all") && tags.size() == 1))
+            tags = new ArrayList<>();
+        if (mentions == null ||
+                mentions.size() == 0 ||
+                (mentions.get(0).equals("all") && mentions.size() == 1))
+            mentions = new ArrayList<>();
+
         User user = Twitter.getTwitter().getUser(id);
         //check if WebSocket connection is open
         if(!user.getVirtualClient().isConnected()){
