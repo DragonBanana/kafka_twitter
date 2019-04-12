@@ -23,20 +23,19 @@ public class UserRoute {
             String id = request.params(":id");
 
             Twitter twitter = Twitter.getTwitter();
-            response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
+            //response.header("Access-Control-Allow-Origin", "http://localhost:8080/");
             //response.header("Access-Control-Allow-Origin", "*");
-            response.header("Access-Control-Allow-Credentials", "true");
+            //response.header("Access-Control-Allow-Credentials", "true");
             //response.header("Set-Cookie", "id="+ id  + "; path=\"/tuamadre\"");
-            response.cookie("/", "id", id, 10000,false, false);
+            response.cookie( "/", "id", id, 10000, false, false);
 //            response.cookie("id", id, -1, false, false);
-
             if (twitter.createNewUser(id)) {
                 response.status(200);
                 return "{\"type\" : \"success\", \"message\" : \"id="+id+"\"}";
             }
             else {
-                response.status(400);
-                return "{\"type\" : \"error\", \"message\" : \"user already exist\"}";
+                response.status(200);
+                return "{\"type\" : \"success\", \"message\" : \"id="+id+"\"}";
             }
         });
 

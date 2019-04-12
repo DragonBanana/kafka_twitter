@@ -18,7 +18,12 @@ public class TwitterRest {
 
         webSocket("/ws", WSHandler.class);
         path("/api", () -> {
-            before("/*", (q, a) -> logger.info("Received api call"));
+            before("/*", (q, a) -> {
+                    logger.info("Received api call");
+                    a.header("Access-Control-Allow-Origin", "null");
+                    a.header("Access-Control-Allow-Credentials", "true");
+                    a.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            });
 
             TweetRoute.configureRoutes();
             UserRoute.configureRoutes();
