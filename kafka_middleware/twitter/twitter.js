@@ -6,11 +6,11 @@ $(document).ready(function () {
         $.ajaxSetup({
             dataType: 'json',
             accept: 'application/json',
-            credentials: 'same-origin',
+            /*credentials: 'same-origin',
             xhrFields: {
                 withCredentials: true
-            },
-            crossDomain: true
+            },*/
+            //crossDomain: true
         });
     };
 
@@ -18,31 +18,40 @@ $(document).ready(function () {
     register = function () {
         username = $("#usernameField").val();
         console.log("send the cookie");
-        $.post("http://localhost:4567/api/users/"+username, 'json').then(res => {
+        $.post("http://localhost:4567/api/users/" + username, 'json').then(res => {
 
             id = res.message.split("=")[0];
             value = res.message.split("=")[1];
             console.log("the cookie: " + document.cookie);
         });
         setup();
-        $.cookie("id", username, { path: "/" });
+        $.cookie("id", username, {
+            path: "/"
+        });
         LoggedIn = true;
-        if(LoggedIn)
-            $("#login").text("Ciao "+ username);
+        if (LoggedIn)
+            $("#login").text("Ciao " + username);
     }
 
 
 
     //Triggered by Get Tweets
     loadSearchedTweets = function () {
-        if(!LoggedIn){
+        if (!LoggedIn) {
             window.alert("Login first!")
-        }
-        else {
+        } else {
 
             tags = [];
             locations = [];
             followedUsers = [];
+
+            //If no checkbox is checked do nothing
+            if (!$("input[name='Locations']").is(":checked") &&
+                !$("input[name='Mentions']").is(":checked") &&
+                !$("input[name='Tags']").is(":checked")) {
+                return;
+            }
+
 
             //If the box is checked split the filters deleting the spaces and
             //join them into a unique string ( "&" is the separator), otherwise use "all"
@@ -74,13 +83,14 @@ $(document).ready(function () {
                 //console.log("tweets: " + JSON.parse(res));
 
                 //Append new data to the modal
-                //$("#getTweetsBody").append(JSON.parse(res));
+                $.each(res, function (index, element) {
+                    $("#getTweetsBody").prepend(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions));
+                });
 
                 //Show the modal
-                //$("#getTweets").modal("show");
+                $("#getTweets").modal("show");
 
                 //Append new data to the modal
-                var jsonData = res;
                 console.log(res);
                 $.each(res, function (index, element) {
                     $("#timeline").prepend(createTweet(element.Author, element.timestamp, element.content, element.location, element.tags, element.mentions));
@@ -89,33 +99,41 @@ $(document).ready(function () {
         }
     }
 
+    closeModal = function () {
+
+        //Close the modal
+        $("#getTweets").modal("show");
+
+        //Clear modal body
+        $("#getTweetsBody").empty();
+    }
+
     //Triggered by Get Tweets
     subscribeTweets = function () {
-        if(!LoggedIn){
+        if (!LoggedIn) {
             window.alert("Login first!")
-        }
-        else {
+        } else {
 
             tags = [];
             locations = [];
             followedUsers = [];
 
+            if (!$("input[name='LocationsS']").is(":checked") &&
+                !$("input[name='MentionsS']").is(":checked") &&
+                !$("input[name='TagsS']").is(":checked")) {
+                return;
+            }
+
             //If the box is checked split the filters deleting the spaces and
             //join them into a unique string ( "&" is the separator), otherwise use "all"
-            if ($("input[name='Locations']:checked").val()) {
+            if ($("input[name='LocationsS']:checked").val()) {
                 locations = $("#locationsSubscribe").val().split(" ").join("&");
-            } else {
-                locations = "all";
             }
-            if ($("input[name='Tags']:checked").val()) {
+            if ($("input[name='TagsS']:checked").val()) {
                 tags = $("#tagsSubscribe").val().split(" ").join("&");
-            } else {
-                tags = "all";
             }
-            if ($("input[name='Mentions']:checked").val()) {
+            if ($("input[name='MentionsS']:checked").val()) {
                 followedUsers = $("#mentionsSubscribe").val().split(" ").join("&");
-            } else {
-                followedUsers = "all";
             }
 
             console.log(locations);
@@ -134,10 +152,9 @@ $(document).ready(function () {
 
 
     streamTweets = function () {
-        if(!LoggedIn){
+        if (!LoggedIn) {
             window.alert("Login first!")
-        }
-        else {
+        } else {
             const url = 'ws://localhost:4567/ws';
             const webSocket = new WebSocket(url);
             webSocket.onmessage = function (event) {
@@ -150,10 +167,9 @@ $(document).ready(function () {
 
     subscribe = function () {
 
-        if(!LoggedIn){
+        if (!LoggedIn) {
             window.alert("Login first!")
-        }
-        else {
+        } else {
             tags = [];
             locations = [];
             followedUsers = [];
@@ -164,13 +180,13 @@ $(document).ready(function () {
                 "locations": locations
             }
 
-            if ($("input[name='Locations']:checked").val()) {
+            if ($("input[name='LocationsS']:checked").val()) {
                 subscription.locations = $("locationsSearch").val.split(" ");
             }
-            if ($("input[name='Tags']:checked").val()) {
+            if ($("input[name='TagsS']:checked").val()) {
                 subscription.tags = $("tagsSearch").val.split(" ");
             }
-            if ($("input[name='Mentions']:checked").val()) {
+            if ($("input[name='MentionsS']:checked").val()) {
                 subscription.followedUsers = $("mentionsSearch").val.split(" ");
             }
 
@@ -181,27 +197,37 @@ $(document).ready(function () {
     }
 
     postTweet = function () {
-        if(!LoggedIn){
+        if (!LoggedIn) {
             window.alert("Login first!");
-        }
-        else {
-            var tweetText = $("tweetText").val();
+        } else {
+            var tweetText = $("#tweetText").val();
             //Get the author from the cookie
             var author = $.cookie('id');
             //Set timestamp (optional)
             var timestamp = Date.now();
 
+            var tagsPost = [];
+
+            var mentionsPost = [];
+
             //TODO Add in html field location
-            locationPost = ";"
+            if ($("#locationPost").val()) {
+                locationPost = $("#locationPost").val();
+            } else {
+                alert("Insert the location");
+                return;
+            }
 
-            //Find tags in the tweet
-            tagsPost = tweetText.split("#").array.forEach(element => {
-                return element.split(" ")[0];
-            });
+            //Split string into an array containing all the words
+            tweetArray = tweetText.split(" ");
+            $.each(tweetArray, function (index, element) {
+                if (element.startsWith("@")) {
+                    mentionsPost.push(element);
+                }
+                if (element.startsWith("#")) {
+                    tagsPost.push(element);
+                }
 
-            //find mentions in the tweet
-            mentionsPost = tweetText.split("@").array.forEach(element => {
-                return element.split(" ")[0];
             });
 
             var tweet = {
@@ -228,10 +254,9 @@ $(document).ready(function () {
 
 
     function createTweet(author, timestamp, content, location, tags, mentions) {
-        if(!LoggedIn){
+        if (!LoggedIn) {
             window.alert("Login first!")
-        }
-        else {
+        } else {
             return '<li> \
                     <div class="timeline-badge"><i class="glyphicon glyphicon-check"></i></div> \
                     <div class="timeline-panel"> \

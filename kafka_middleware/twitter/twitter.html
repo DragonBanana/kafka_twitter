@@ -31,17 +31,17 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle mr-2 ml-2" href="#" id="navbarDropdown" role="button"
+          <a class="nav-link dropdown-toggle mr-2 ml-2" href="#" id="navbarDropdown1" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Subscribe
           </a>
-          <div class="dropdown-menu" style="width: 18vw;;" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" style="width: 18vw;;" aria-labelledby="navbarDropdownlabel">
             <a class="dropdown-item">
 
               <div class="input-group m-2">
                 <div class="input-group-prepend">
                   <div class="input-group-text">
-                    <input type="checkbox" name="Locations" aria-label="Checkbox for following text input">
+                    <input type="checkbox" name="LocationsS" aria-label="Checkbox for following text input">
                   </div>
                 </div>
                 <input type="text" id="locationsSubscribe" class="form-control" placeholder="Locations"
@@ -54,7 +54,7 @@
               <div class="input-group m-2">
                 <div class="input-group-prepend">
                   <div class="input-group-text">
-                    <input type="checkbox" aria-label="Checkbox for following text input" name="Tags">
+                    <input type="checkbox" aria-label="Checkbox for following text input" name="TagsS">
                   </div>
                 </div>
                 <input type="text" id="tagsSubscribe" class="form-control" placeholder="Tags"
@@ -67,7 +67,7 @@
               <div class="input-group m-2">
                 <div class="input-group-prepend">
                   <div class="input-group-text">
-                    <input type="checkbox" name="Mentions" aria-label="Checkbox for following text input">
+                    <input type="checkbox" name="MentionsS" aria-label="Checkbox for following text input">
                   </div>
                 </div>
                 <input type="text" id="mentionsSubscribe" class="form-control" placeholder="Mentions"
@@ -187,13 +187,13 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title" id="exampleModalLongTitle">Searched Tweets</h5>
+          <button type="button" class="close" onclick="closeModal()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div id="getTweets" class="modal-body">
-          ...
+        <div id="getTweetsBody" class="modal-body">
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -213,8 +213,14 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-12 m-2">
-        <div class="text-right mr-2">
+      <div class="col-3">
+          <div class="input-group m-2">
+              <input type="text" id="locationPost" class="form-control" placeholder="Location"
+                aria-label="Text inputS">
+            </div>
+      </div>
+      <div class="col-9">
+        <div class="text-right m-2">
           <button id="postButton" type="button" class="btn btn-primary" onclick="postTweet()">Post</button>
         </div>
       </div>
