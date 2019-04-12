@@ -108,11 +108,30 @@ $(document).ready(function () {
         $("#getTweetsBody").empty();
     }
 
+    streamTweets = function () {
+        if (!LoggedIn) {
+            window.alert("Login first!")
+        } else {
+            const url = 'ws://localhost:4567/ws';
+            var webSocket
+            console.log(webSocket);
+            if(webSocket == null) {
+                webSocket = new WebSocket(url);
+                webSocket.onmessage = function (event) {
+                    var tweet = JSON.parse(event.data);
+                    $("#timeline").prepend(createTweet(tweet.author, tweet.timestamp, tweet.content, tweet.location, tweet.tags, tweet.mentions));
+                }
+            }
+            //Api for tweet streaming
+        }
+    }
+
     //Triggered by Get Tweets
     subscribeTweets = function () {
         if (!LoggedIn) {
             window.alert("Login first!")
         } else {
+            streamTweets();
 
             tags = [];
             locations = [];
@@ -129,11 +148,20 @@ $(document).ready(function () {
             if ($("input[name='LocationsS']:checked").val()) {
                 locations = $("#locationsSubscribe").val().split(" ").join("&");
             }
+            else{
+                locations = "all";
+            }
             if ($("input[name='TagsS']:checked").val()) {
                 tags = $("#tagsSubscribe").val().split(" ").join("&");
             }
+            else{
+                tags = "all";
+            }
             if ($("input[name='MentionsS']:checked").val()) {
                 followedUsers = $("#mentionsSubscribe").val().split(" ").join("&");
+            }
+            else{
+                followedUsers = "all";
             }
 
             console.log(locations);
@@ -151,19 +179,6 @@ $(document).ready(function () {
     }
 
 
-    streamTweets = function () {
-        if (!LoggedIn) {
-            window.alert("Login first!")
-        } else {
-            const url = 'ws://localhost:4567/ws';
-            const webSocket = new WebSocket(url);
-            webSocket.onmessage = function (event) {
-                var tweet = JSON.parse(event.data);
-                $("#timeline").prepend(createTweet(tweet.author, tweet.timestamp, tweet.content, tweet.location, tweet.tags, tweet.mentions));
-            }
-            //Api for tweet streaming
-        }
-    }
 
     subscribe = function () {
 
