@@ -1,0 +1,8 @@
+*) Numero di topic 3 (location, tags e mentions).
+*) Filtro come /location/tag/mention.
+*) Usare i cookies per riconoscere un utente.
+*) Per topic mentions e tags, usiamo una partition sink per inserire tutti i tweet con mentions / o tags multipli.
+*) Server-sent-event con JAX-RS
+*) Server offre una REST API per subscribe con filtro (per lo streaming dei tweet).
+*) Offset su DB noSQL.
+*) Usiamo come chiave dell'offset l'id dell'utente e il filtro che ha usato per la ricerca.
