@@ -36,6 +36,8 @@ Kafka Topics with replication factor > 1 are reliable.
 - **Spark REST** - a micro framework for creating web applications in Java 8 with minimal effort.
 - **Websocket** - a computer communications protocol, providing full-duplex communication channels over a single TCP connection.
 
+![Alt text](images/architecture.png "Architecture")
+
 ## REST APIs
 
 - **POST /users/{id}** creates a user. Returns a success message if the user has been correctly created, otherwise it returns an error message.
