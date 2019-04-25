@@ -1,5 +1,8 @@
 package kafka.model;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tweet {
@@ -7,7 +10,7 @@ public class Tweet {
     /**
      * The author of the tweet.
      */
-    private String Author;
+    private String author;
 
     /**
      * The content of the tweet.
@@ -20,7 +23,7 @@ public class Tweet {
     private String timestamp;
 
     /**
-     * The location of the tweet.
+     * The location of the tweet and it is supposed to be unique in a tweet
      */
     private String location;
 
@@ -44,7 +47,7 @@ public class Tweet {
      * @param mentions the mentions of the tweet.
      */
     public Tweet(String author, String content, String timestamp, String location, List<String> tags, List<String> mentions) {
-        Author = author;
+        this.author = author;
         this.content = content;
         this.timestamp = timestamp;
         this.location = location;
@@ -57,7 +60,7 @@ public class Tweet {
      * @return the author of the tweet.
      */
     public String getAuthor() {
-        return Author;
+        return author;
     }
 
     /**
@@ -98,5 +101,42 @@ public class Tweet {
      */
     public List<String> getMentions() {
         return mentions;
+    }
+
+    /**
+     * Return the filters type used in the tweet.
+     * All possible values are : location, tag, mention.
+     * @return The list containig the filter type
+     */
+    public List<String> getFilters() {
+        List<String> result = new ArrayList<>();
+
+        System.out.println("getFilters" + new Gson().toJson(this));
+
+        if (mentions.size() > 0)
+            result.add(Topic.MENTION);
+
+        if (tags.size() > 0)
+            result.add(Topic.TAG);
+
+        result.add(Topic.LOCATION);
+
+        return result;
+    }
+
+    public boolean equals(Tweet t) {
+        return t.getTags().containsAll(this.getTags()) &&
+                this.getTags().containsAll(t.getTags()) &&
+                t.getMentions().containsAll(this.getMentions()) &&
+                this.getMentions().containsAll(t.getMentions()) &&
+                t.getLocation().equals(this.getLocation()) &&
+                t.getAuthor().equals(this.getAuthor()) &&
+                t.getContent().equals(this.getContent()) &&
+                t.getTimestamp().equals(this.getTimestamp());
+    }
+
+    public int hashCode() {
+        String tweet = new Gson().toJson(this);
+        return tweet.hashCode();
     }
 }

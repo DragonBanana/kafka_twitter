@@ -1,7 +1,6 @@
 package kafka.utility;
 
-import kafka.model.Tweet;
-import org.apache.avro.hadoop.io.AvroSerializer;
+import kafka.partitioner.TweetPartitioner;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -12,8 +11,8 @@ import java.util.Properties;
 public class ProducerFactory {
 
     /**
-     * Return the producer for location topic.
-     * @return the producer for location topic.
+     * Return the producer.
+     * @return the producer.
      */
     public static Producer<String, String> getTweetProducer() {
 
@@ -21,7 +20,7 @@ public class ProducerFactory {
         Properties props = getDefaultProperty();
 
         //Configuring the custom partitioner
-        //props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, TweetPartitioner.class.getName());
+        props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, TweetPartitioner.class.getName());
 
         //Creating the producer
         return new KafkaProducer<>(props);
@@ -33,10 +32,14 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "151.0.231.141:32768");
+        //TODO Check what transactional id has to be assigned
+        String transactionId = Double.toString(Math.abs(Math.random()));
+        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionId);
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "5000");
+        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "10000");
         return props;
     }
 
