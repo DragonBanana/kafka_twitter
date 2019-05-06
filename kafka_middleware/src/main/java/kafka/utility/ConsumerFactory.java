@@ -23,7 +23,7 @@ public class ConsumerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "151.0.231.141:32768");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "151.0.231.141:32780");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");
