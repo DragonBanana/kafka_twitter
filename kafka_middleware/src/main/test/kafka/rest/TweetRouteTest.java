@@ -146,7 +146,7 @@ public class TweetRouteTest {
     }
 
     @Test
-    public void get_tweet_successful() {
+    public void get_tweet_successful() throws InterruptedException {
         String id = "5";
         when().
                 post("http://localhost:4567/api/users/" + id).
@@ -179,6 +179,7 @@ public class TweetRouteTest {
                     response().asString();
         });
 
+        Thread.sleep(5000);
         tweets.forEach(t -> {
 
             String response = given().

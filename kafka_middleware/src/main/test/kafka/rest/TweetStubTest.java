@@ -89,7 +89,7 @@ public class TweetStubTest {
     }
 
     @Test
-    public void consumeTweetByLocation() {
+    public void consumeTweetByLocation() throws InterruptedException {
         tweetList.forEach(t -> {
             try {
                 new TweetStub().save(t);
@@ -97,6 +97,7 @@ public class TweetStubTest {
                 e.printStackTrace();
             }
         });
+        Thread.sleep(5000);
         List<Tweet> tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc1"), filter);
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
@@ -111,7 +112,7 @@ public class TweetStubTest {
     }
 
     @Test
-    public void consumeTweetByTag() {
+    public void consumeTweetByTag() throws InterruptedException {
         tweetList.forEach(t -> {
             try {
                 new TweetStub().save(t);
@@ -119,6 +120,7 @@ public class TweetStubTest {
                 e.printStackTrace();
             }
         });
+        Thread.sleep(5000);
         List<Tweet> tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag1"), filter+"#tag1");
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
@@ -144,7 +146,7 @@ public class TweetStubTest {
     }
 
     @Test
-    public void consumeTweetByMention() {
+    public void consumeTweetByMention() throws InterruptedException {
         tweetList.forEach(t -> {
             try {
                 new TweetStub().save(t);
@@ -152,6 +154,7 @@ public class TweetStubTest {
                 e.printStackTrace();
             }
         });
+        Thread.sleep(5000);
         List<Tweet> tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men1"), filter+"@men1");
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
