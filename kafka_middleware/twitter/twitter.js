@@ -174,9 +174,11 @@ $(document).ready(function () {
 
 
             webSocket.onopen = function () {
-                $.post("http://localhost:4567/api/tweets/subscription/" + path).then(res => {
-                    console.log(res);
-                });
+                setTimeout(function () {
+                    $.post("http://localhost:4567/api/tweets/subscription/" + path).then(res => {
+                        console.log(res);
+                    });
+                }, 500);
             }
 
             //REST API
