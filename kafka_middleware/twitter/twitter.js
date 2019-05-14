@@ -82,6 +82,7 @@ $(document).ready(function () {
             $.get("http://localhost:4567/api/tweets/" + path).then(res => {
                 //console.log("tweets: " + JSON.parse(res));
 
+                $("#getTweetsBody").empty();
                 //Append new data to the modal
                 $.each(res, function (index, element) {
                     $("#getTweetsBody").prepend(createTweet(element.author, element.timestamp, element.content, element.location, element.tags, element.mentions));

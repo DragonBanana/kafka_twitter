@@ -43,8 +43,6 @@ public class TweetStub {
             records.add(new ProducerRecord<>(filter, tweet.getLocation(),
                     new Gson().toJson(tweet, Tweet.class)));
         }
-        System.out.println(tweetFilters);
-        System.out.println(records);
 
         long timestamp = 0;
 
@@ -105,11 +103,11 @@ public class TweetStub {
             locationToFollow = new ArrayList<>();
         if (tagToFollow == null ||
                 tagToFollow.size() == 0 ||
-                (tagToFollow.get(0).equals("all") && tagToFollow.size() == 1))
+                (tagToFollow.get(0).equals("#all") && tagToFollow.size() == 1))
             tagToFollow = new ArrayList<>();
         if (userToFollow == null ||
                 userToFollow.size() == 0 ||
-                (userToFollow.get(0).equals("all") && userToFollow.size() == 1))
+                (userToFollow.get(0).equals("@all") && userToFollow.size() == 1))
             userToFollow = new ArrayList<>();
 
         //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
@@ -123,6 +121,7 @@ public class TweetStub {
         } else
             //filter tweet using users mentioned (and tag if present).
             tweets = findLatestByMentions(id, userToFollow, filter);
+
 
         tweets = TweetFilter.filterByLocations(tweets, locationToFollow);
         tweets = TweetFilter.filterByMentions(tweets, userToFollow);
@@ -160,7 +159,7 @@ public class TweetStub {
         //Polling the data.
         do {
             ts.clear();
-            ConsumerRecords<String, String> records = consumer.poll(1000);
+            ConsumerRecords<String, String> records = consumer.poll(500);
             //Transforming data and filtering. (!Only by location)
             ts = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
             tweets.addAll(ts);
@@ -220,11 +219,9 @@ public class TweetStub {
         consumer.assign(topicPartitions);
         topicPartitions.stream()
                 .forEach(topicPartition -> {
-                    System.out.println(topicPartition.partition());
                     //Getting the offset from the db.
                     long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
                     //Moving the offset.
-                    System.out.println(offset);
                     consumer.seek(topicPartition, offset);
 
                 });
@@ -233,7 +230,7 @@ public class TweetStub {
         do{
             ts.clear();
             //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(1000);
+            ConsumerRecords<String, String> records = consumer.poll(500);
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
@@ -293,14 +290,13 @@ public class TweetStub {
         do{
             ts.clear();
             //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(1000);
+            ConsumerRecords<String, String> records = consumer.poll(500);
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
                 if (t.getMentions().stream().anyMatch(mentions::contains))
                     ts.add(t);
             });
-            System.out.println(ts.size());
             tweets.addAll(ts);
         }while(ts.size() > 0);
         topicPartitions.forEach(topicPartition -> {

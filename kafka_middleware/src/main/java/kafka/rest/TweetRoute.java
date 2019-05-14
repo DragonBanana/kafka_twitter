@@ -8,6 +8,7 @@ import kafka.utility.TweetValidator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -61,8 +62,8 @@ public class TweetRoute {
             response.status(200);
 
             List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
-            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&")));
-            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&")));
+            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&"))).stream().map(tag -> "#".concat(tag)).collect(Collectors.toList());
+            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map(tag -> "@".concat(tag)).collect(Collectors.toList());
 
             return new Gson().toJson(new TweetStub().findTweets(id, locations, mentions, tags));
             //TODO check error in filters
@@ -80,8 +81,8 @@ public class TweetRoute {
             }
 
             List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
-            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&")));
-            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&")));
+            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&"))).stream().map(tag -> "#".concat(tag)).collect(Collectors.toList());
+            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map(tag -> "@".concat(tag)).collect(Collectors.toList());
 
             if (!new TweetStub().subscription(id, locations, tags, mentions)){
                 response.type("application/json");
