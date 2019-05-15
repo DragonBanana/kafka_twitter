@@ -97,6 +97,9 @@ public class TweetStub {
         String mentionFilters = StringUtils.join(userToFollow, "");
         String filter = locationFilters + tagFilters + mentionFilters;
 
+        System.out.println("PRE FILTER");
+        tagToFollow.forEach(t -> System.out.println(t));
+
         if (locationToFollow == null ||
                 locationToFollow.size() == 0 ||
                 (locationToFollow.get(0).equals("all") && locationToFollow.size() == 1))
@@ -110,6 +113,8 @@ public class TweetStub {
                 (userToFollow.get(0).equals("@all") && userToFollow.size() == 1))
             userToFollow = new ArrayList<>();
 
+        System.out.println("POST FILTER");
+        tagToFollow.forEach(t -> System.out.println(t));
         //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
         //tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
         List<Tweet> tweets;
@@ -117,15 +122,22 @@ public class TweetStub {
             tweets = findLatestByLocations(id, locationToFollow, filter);
         } else if (userToFollow.isEmpty()) {
             //filter tweet using only tag.
+            System.out.println("STIAMO ESEGUENDO FIND LATEST BY TAG");
+            tagToFollow.forEach(t -> System.out.println(t));
             tweets = findLatestByTags(id, tagToFollow, filter);
         } else
             //filter tweet using users mentioned (and tag if present).
             tweets = findLatestByMentions(id, userToFollow, filter);
 
 
+        System.out.println("loc pre filter" + tweets.size());
+        System.out.println("location is " + locationToFollow);
         tweets = TweetFilter.filterByLocations(tweets, locationToFollow);
+        System.out.println("men pre filter" + tweets.size());
         tweets = TweetFilter.filterByMentions(tweets, userToFollow);
+        System.out.println("tag pre filter" + tweets.size());
         tweets = TweetFilter.filterByTags(tweets, tagToFollow);
+        System.out.println("final filter" + tweets.size());
 
         return tweets;
     }
@@ -199,6 +211,7 @@ public class TweetStub {
      * @return the latest tweet filtered by tags.
      */
     public List<Tweet> findLatestByTags(String id, List<String> tags, String filter) {
+        System.out.println("SIAMO DENTRO, CIAO");
         //The topic we are reading from.
         String topic = Topic.TAG;
         //Getting the consumer.
@@ -208,6 +221,7 @@ public class TweetStub {
         if (tags.size() == 1) {
             //Getting the partition of the topic.
             int partition = TopicPartitionFactory.getTagPartition(tags.get(0));
+            System.out.println("partition tag = " + partition);
             //Creating the topic partition object (it is required in the next instructions).
             topicPartitions.add(new TopicPartition(topic, partition));
         }
@@ -223,7 +237,7 @@ public class TweetStub {
                     long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
                     //Moving the offset.
                     consumer.seek(topicPartition, offset);
-
+                    System.out.println(topicPartition.partition());
                 });
         List<Tweet> ts = new ArrayList();
         List<Tweet> tweets = new ArrayList();
@@ -232,11 +246,13 @@ public class TweetStub {
             //Polling the data.
             ConsumerRecords<String, String> records = consumer.poll(500);
             //Transforming data and filtering. (!Only by tag)
+            System.out.println("records count " + records.count());
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
                 if (t.getTags().stream().anyMatch(tags::contains))
                     ts.add(t);
             });
+            System.out.println("ts count" + ts.size());
             tweets.addAll(ts);
         }while(ts.size() > 0);
         topicPartitions.forEach(topicPartition -> {
@@ -247,6 +263,8 @@ public class TweetStub {
 
         });
         //Returning the data
+        System.out.println("tweets size = " + tweets.size());
+        tweets.forEach(t -> System.out.println(new Gson().toJson(t)));
         return tweets;
     }
 
@@ -317,11 +335,11 @@ public class TweetStub {
             locations = new ArrayList<>();
         if (tags == null ||
                 tags.size() == 0 ||
-                (tags.get(0).equals("all") && tags.size() == 1))
+                (tags.get(0).equals("#all") && tags.size() == 1))
             tags = new ArrayList<>();
         if (mentions == null ||
                 mentions.size() == 0 ||
-                (mentions.get(0).equals("all") && mentions.size() == 1))
+                (mentions.get(0).equals("@all") && mentions.size() == 1))
             mentions = new ArrayList<>();
 
         User user = Twitter.getTwitter().getUser(id);

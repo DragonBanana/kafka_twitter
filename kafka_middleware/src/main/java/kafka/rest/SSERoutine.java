@@ -42,18 +42,32 @@ public class SSERoutine implements Runnable {
                 List<String> locationsFollowed = subscription.getLocationsFollowed();
                 List<String> tagsFollowed = subscription.getTagsFollowed();
                 List<String> usersFollowed = subscription.getUsersFollowed();
+                System.out.println("lf size" + locationsFollowed.size());
+                System.out.println("tag size" + tagsFollowed.size());
+                System.out.println("user size" + usersFollowed.size());
+                tagsFollowed.forEach(tag -> System.out.println("i tag" + tag));
+                usersFollowed.forEach(tag -> System.out.println("i mention" + tag));
 
                 //TODO poll()
                 //List<Tweet> tweets = tweetStub.findTweets(user.getId(), locationsFollowed, tagsFollowed, usersFollowed);
 
                 List<Tweet> tweets = new ArrayList<>();
-                tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Arrays.asList("all"), Arrays.asList("all")));
-                tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), tagsFollowed, Arrays.asList("all")));
-                tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), Arrays.asList("all"), usersFollowed));
+                if (!locationsFollowed.isEmpty())
+                    tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Arrays.asList("@all"), Arrays.asList("#all")));
+                if (!tagsFollowed.isEmpty()) {
+                    tagsFollowed.forEach(t -> System.out.println(t));
+                    tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), Arrays.asList("@all"), tagsFollowed));
+                    System.out.println("SIAMO USCITI E' STATO BELLO");
+                }
+                if (!usersFollowed.isEmpty()) {
+                    tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), usersFollowed, Arrays.asList("#all")));
+                    System.out.println("QUI NON SAREI DOVUTO ENTRARE");
+                }
 
                 //filter duplicate tweets
                 tweets = tweets.stream().distinct().collect(Collectors.toList());
 
+                System.out.println("tweets size SSE" + tweets.size());
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 //todo VirtualClient.notify();
                 user.notityTweets(tweets);

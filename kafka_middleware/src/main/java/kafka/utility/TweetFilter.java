@@ -14,6 +14,9 @@ public class TweetFilter {
      * @return the list of tweets filtered my locations.
      */
     public static List<Tweet> filterByLocations(List<Tweet> tweets, List<String> locations) {
+        if(locations.isEmpty()) {
+            return tweets;
+        }
         return tweets.stream()
                 .filter(t -> locations.stream()
                         .anyMatch(loc -> t.getLocation().equals(loc)))

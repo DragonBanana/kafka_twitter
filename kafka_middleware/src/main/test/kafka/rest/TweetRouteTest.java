@@ -179,7 +179,7 @@ public class TweetRouteTest {
                     response().asString();
         });
 
-        Thread.sleep(5000);
+        Thread.sleep(10000);
         tweets.forEach(t -> {
 
             String response = given().
