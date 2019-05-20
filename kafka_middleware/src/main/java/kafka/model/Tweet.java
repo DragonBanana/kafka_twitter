@@ -113,10 +113,10 @@ public class Tweet {
 
         System.out.println("getFilters" + new Gson().toJson(this));
 
-        if (mentions.size() > 0)
+        if (!mentions.isEmpty())
             result.add(Topic.MENTION);
 
-        if (tags.size() > 0)
+        if (!tags.isEmpty())
             result.add(Topic.TAG);
 
         result.add(Topic.LOCATION);

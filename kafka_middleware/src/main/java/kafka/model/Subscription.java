@@ -17,26 +17,26 @@ public class Subscription {
     /**
      * Tags followedUsers by the user
      */
-    private Set<String> tags = new HashSet<>();
+    private Set<String> tags;
 
     /**
      * Users followed
      */
-    private Set<String> followedUsers = new HashSet<>();
+    private Set<String> followedUsers;
 
     /**
      * Locations followed
      */
-    private Set<String> locations = new HashSet<>();
+    private Set<String> locations;
 
     public Subscription(User user) {
 
         //TODO use username instead of id
         //A user can always see its own tweets
-        followedUsers.add(user.getId());
+        followedUsers = new HashSet<>();
         tags = new HashSet<>();
         locations = new HashSet<>();
-        followedUsers = new HashSet<>();
+        followedUsers.add(user.getId());
     }
 
     public Set<String> getTags() {

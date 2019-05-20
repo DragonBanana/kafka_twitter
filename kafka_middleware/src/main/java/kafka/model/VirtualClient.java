@@ -19,7 +19,7 @@ public class VirtualClient {
         this.session = session;
     }
 
-    public void notityTweets(List<Tweet> tweets) {
+    void notityTweets(List<Tweet> tweets) {
         if(this.isConnected()) {
             tweets.forEach(t -> {
                 try {

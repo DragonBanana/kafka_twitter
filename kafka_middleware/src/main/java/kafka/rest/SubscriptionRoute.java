@@ -8,9 +8,9 @@ import java.util.Set;
 
 import static spark.Spark.post;
 
-public class SubscriptionRoute {
+class SubscriptionRoute {
 
-    public static void configureRoutes() {
+    static void configureRoutes() {
 
         post("/subscription", (request, response) -> {
             response.type("application/json");
@@ -36,7 +36,6 @@ public class SubscriptionRoute {
 
             SubscriptionStub subscriptionStub = twitter.getUser(id).getSubscriptionStub();
 
-            //TODO Set Virtual Client
 
             if (!locationToFollow.isEmpty()) {
                 locationToFollow.forEach(subscriptionStub::followLocation);
@@ -52,7 +51,6 @@ public class SubscriptionRoute {
 
             response.status(200);
             response.header("Access-Control-Allow-Origin", "*");
-            //return "Subscriptions created";
             return new Gson().toJson(subscriptionStub);
         });
     }

@@ -18,7 +18,7 @@ import org.apache.kafka.common.errors.ProducerFencedException;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ public class TweetStub {
      * @return the tweet that has been saved.
      */
 
-    public Tweet save(Tweet tweet) throws Exception {
+    Tweet save(Tweet tweet) {
 
         //Get the filters used in the tweet.
         List<String> tweetFilters = tweet.getFilters();
@@ -46,7 +46,6 @@ public class TweetStub {
 
         long timestamp = 0;
 
-        //if(tweet.getTags().stream().allMatch(s -> s.startsWith("#")) && tweet.getMentions().stream().allMatch(s -> s.startsWith("@"))) {
         //Send data to Kafka
         for (ProducerRecord<String, String> record : records) {
             Producer<String, String> producer = ProducerFactory.getTweetProducer();
@@ -67,10 +66,6 @@ public class TweetStub {
             }
         }
 
-        //} else {
-        //    throw new Exception();
-        //}
-
         if (Twitter.getTwitter().isSSEDone()) {
             System.out.println("Start SSE Routine");
             Twitter.getTwitter().startSSE(timestamp);
@@ -89,16 +84,13 @@ public class TweetStub {
      * @param tagToFollow      mention filters.
      * @return the latest tweet filtered using the filters params.
      */
-    public List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow) {
+    List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow) {
 
         //taking out filters by locations, userFollowed and tags
         String locationFilters = StringUtils.join(locationToFollow, "");
         String tagFilters = StringUtils.join(tagToFollow, "");
         String mentionFilters = StringUtils.join(userToFollow, "");
         String filter = locationFilters + tagFilters + mentionFilters;
-
-        System.out.println("PRE FILTER");
-        tagToFollow.forEach(t -> System.out.println(t));
 
         if (locationToFollow == null ||
                 locationToFollow.size() == 0 ||
@@ -113,8 +105,6 @@ public class TweetStub {
                 (userToFollow.get(0).equals("@all") && userToFollow.size() == 1))
             userToFollow = new ArrayList<>();
 
-        System.out.println("POST FILTER");
-        tagToFollow.forEach(t -> System.out.println(t));
         //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
         //tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
         List<Tweet> tweets;
@@ -122,22 +112,15 @@ public class TweetStub {
             tweets = findLatestByLocations(id, locationToFollow, filter);
         } else if (userToFollow.isEmpty()) {
             //filter tweet using only tag.
-            System.out.println("STIAMO ESEGUENDO FIND LATEST BY TAG");
-            tagToFollow.forEach(t -> System.out.println(t));
             tweets = findLatestByTags(id, tagToFollow, filter);
         } else
             //filter tweet using users mentioned (and tag if present).
             tweets = findLatestByMentions(id, userToFollow, filter);
 
 
-        System.out.println("loc pre filter" + tweets.size());
-        System.out.println("location is " + locationToFollow);
         tweets = TweetFilter.filterByLocations(tweets, locationToFollow);
-        System.out.println("men pre filter" + tweets.size());
         tweets = TweetFilter.filterByMentions(tweets, userToFollow);
-        System.out.println("tag pre filter" + tweets.size());
         tweets = TweetFilter.filterByTags(tweets, tagToFollow);
-        System.out.println("final filter" + tweets.size());
 
         return tweets;
     }
@@ -160,7 +143,7 @@ public class TweetStub {
         //Creating the topic partition object (it is required in the next instructions).
         TopicPartition topicPartition = new TopicPartition(topic, partition);
         //Subscribe to a topic.
-        consumer.assign(Arrays.asList(topicPartition));
+        consumer.assign(Collections.singletonList(topicPartition));
         //Getting the offset from the db.
         long offset = new AzureDBConn().get(new OffsetKey(id, filter, partition)).getValue().getOffset();
         //Moving the offset.
@@ -171,11 +154,11 @@ public class TweetStub {
         //Polling the data.
         do {
             ts.clear();
-            ConsumerRecords<String, String> records = consumer.poll(500);
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
             //Transforming data and filtering. (!Only by location)
             ts = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
             tweets.addAll(ts);
-        }while(ts.size() > 0);
+        } while (!ts.isEmpty());
 
         //Getting the new offset.
         offset = consumer.position(topicPartition);
@@ -193,7 +176,7 @@ public class TweetStub {
      * @param filter    the filters for the research.
      * @return the latest tweet filtered by location.
      */
-    public List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
+    List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
         return locations.stream()
                 .map(l -> findLatestByLocation(id, l, filter))
                 .reduce((l1, l2) -> {
@@ -210,8 +193,7 @@ public class TweetStub {
      * @param filter the filters for the research.
      * @return the latest tweet filtered by tags.
      */
-    public List<Tweet> findLatestByTags(String id, List<String> tags, String filter) {
-        System.out.println("SIAMO DENTRO, CIAO");
+    List<Tweet> findLatestByTags(String id, List<String> tags, String filter) {
         //The topic we are reading from.
         String topic = Topic.TAG;
         //Getting the consumer.
@@ -221,7 +203,6 @@ public class TweetStub {
         if (tags.size() == 1) {
             //Getting the partition of the topic.
             int partition = TopicPartitionFactory.getTagPartition(tags.get(0));
-            System.out.println("partition tag = " + partition);
             //Creating the topic partition object (it is required in the next instructions).
             topicPartitions.add(new TopicPartition(topic, partition));
         }
@@ -231,30 +212,28 @@ public class TweetStub {
         topicPartitions.add(new TopicPartition(topic, partition));
         //Subscribe to a topic.
         consumer.assign(topicPartitions);
-        topicPartitions.stream()
+        topicPartitions
                 .forEach(topicPartition -> {
                     //Getting the offset from the db.
                     long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
                     //Moving the offset.
                     consumer.seek(topicPartition, offset);
-                    System.out.println(topicPartition.partition());
+
                 });
-        List<Tweet> ts = new ArrayList();
-        List<Tweet> tweets = new ArrayList();
-        do{
+        List<Tweet> ts = new ArrayList<>();
+        List<Tweet> tweets = new ArrayList<>();
+        do {
             ts.clear();
             //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(500);
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
             //Transforming data and filtering. (!Only by tag)
-            System.out.println("records count " + records.count());
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
                 if (t.getTags().stream().anyMatch(tags::contains))
                     ts.add(t);
             });
-            System.out.println("ts count" + ts.size());
             tweets.addAll(ts);
-        }while(ts.size() > 0);
+        } while (!ts.isEmpty());
         topicPartitions.forEach(topicPartition -> {
             //Getting the new offset.
             long offset = consumer.position(topicPartition);
@@ -263,8 +242,6 @@ public class TweetStub {
 
         });
         //Returning the data
-        System.out.println("tweets size = " + tweets.size());
-        tweets.forEach(t -> System.out.println(new Gson().toJson(t)));
         return tweets;
     }
 
@@ -276,7 +253,7 @@ public class TweetStub {
      * @param filter   the filters for the research.
      * @return the latest tweet filtered by user.
      */
-    public List<Tweet> findLatestByMentions(String id, List<String> mentions, String filter) {
+    List<Tweet> findLatestByMentions(String id, List<String> mentions, String filter) {
 
         //The topic we are reading from.
         String topic = Topic.MENTION;
@@ -296,19 +273,19 @@ public class TweetStub {
         topicPartitions.add(new TopicPartition(topic, partition));
         //Subscribe to a topic.
         consumer.assign(topicPartitions);
-        topicPartitions.stream()
+        topicPartitions
                 .forEach(topicPartition -> {
                     //Getting the offset from the db.
                     long offset = new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset();
                     //Moving the offset.
                     consumer.seek(topicPartition, offset);
                 });
-        List<Tweet> tweets = new ArrayList();
-        List<Tweet> ts = new ArrayList();
-        do{
+        List<Tweet> tweets = new ArrayList<>();
+        List<Tweet> ts = new ArrayList<>();
+        do {
             ts.clear();
             //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(500);
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
@@ -316,7 +293,7 @@ public class TweetStub {
                     ts.add(t);
             });
             tweets.addAll(ts);
-        }while(ts.size() > 0);
+        } while (!ts.isEmpty());
         topicPartitions.forEach(topicPartition -> {
             //Getting the new offset.
             long offset = consumer.position(topicPartition);
@@ -327,25 +304,24 @@ public class TweetStub {
         return tweets;
     }
 
-    public boolean subscription(String id, List<String> locations, List<String> tags,List<String> mentions){
+    public boolean subscription(String id, List<String> locations, List<String> tags, List<String> mentions) {
 
         if (locations == null ||
-                locations.size() == 0 ||
+                locations.isEmpty() ||
                 (locations.get(0).equals("all") && locations.size() == 1))
             locations = new ArrayList<>();
         if (tags == null ||
-                tags.size() == 0 ||
-                (tags.get(0).equals("#all") && tags.size() == 1))
+                tags.isEmpty() ||
+                (tags.get(0).equals("all") && tags.size() == 1))
             tags = new ArrayList<>();
         if (mentions == null ||
-                mentions.size() == 0 ||
-                (mentions.get(0).equals("@all") && mentions.size() == 1))
+                mentions.isEmpty() ||
+                (mentions.get(0).equals("all") && mentions.size() == 1))
             mentions = new ArrayList<>();
 
         User user = Twitter.getTwitter().getUser(id);
         //check if WebSocket connection is open
-        if(!user.getVirtualClient().isConnected()){
-            //TODO return error
+        if (!user.getVirtualClient().isConnected()) {
             return false;
         }
 
@@ -354,8 +330,6 @@ public class TweetStub {
         locations.forEach(subStub::followLocation);
         tags.forEach(subStub::followTag);
         mentions.forEach(subStub::followUser);
-
-
 
         return true;
     }
