@@ -105,8 +105,6 @@ public class TweetStub {
                 (userToFollow.get(0).equals("@all") && userToFollow.size() == 1))
             userToFollow = new ArrayList<>();
 
-        //userToFollow = userToFollow.stream().map("@"::concat).collect(Collectors.toList());
-        //tagToFollow = tagToFollow.stream().map("#"::concat).collect(Collectors.toList());
         List<Tweet> tweets;
         if (!locationToFollow.isEmpty()) {
             tweets = findLatestByLocations(id, locationToFollow, filter);

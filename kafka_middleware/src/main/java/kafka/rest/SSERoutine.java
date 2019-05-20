@@ -47,23 +47,18 @@ public class SSERoutine implements Runnable {
 
                 List<Tweet> tweets = new ArrayList<>();
                 if (!locationsFollowed.isEmpty())
-                    tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Arrays.asList("@all"), Arrays.asList("#all")));
+                    tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Collections.singletonList("@all"), Collections.singletonList("#all")));
                 if (!tagsFollowed.isEmpty()) {
-                    tagsFollowed.forEach(t -> System.out.println(t));
-                    tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), Arrays.asList("@all"), tagsFollowed));
-                    System.out.println("SIAMO USCITI E' STATO BELLO");
+                    tweets.addAll(tweetStub.findTweets(user.getId(), Collections.singletonList("all"), Collections.singletonList("@all"), tagsFollowed));
                 }
                 if (!usersFollowed.isEmpty()) {
-                    tweets.addAll(tweetStub.findTweets(user.getId(), Arrays.asList("all"), usersFollowed, Arrays.asList("#all")));
-                    System.out.println("QUI NON SAREI DOVUTO ENTRARE");
+                    tweets.addAll(tweetStub.findTweets(user.getId(), Collections.singletonList("all"), usersFollowed, Collections.singletonList("#all")));
                 }
 
                 //filter duplicate tweets
                 tweets = tweets.stream().distinct().collect(Collectors.toList());
 
-                System.out.println("tweets size SSE" + tweets.size());
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
-                //VirtualClient.notify();
                 user.notityTweets(tweets);
 
                 //update poll

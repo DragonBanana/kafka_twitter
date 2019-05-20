@@ -7,7 +7,7 @@ import static spark.Spark.post;
 /**
  * Routes regarding users management
  */
-public class UserRoute {
+class UserRoute {
 
     /**
      * POST /users/:id API used for both login and registration to Twitter.

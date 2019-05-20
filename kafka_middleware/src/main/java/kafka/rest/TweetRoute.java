@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
-public class TweetRoute {
+class TweetRoute {
 
-    public static void configureRoutes() {
+    static void configureRoutes() {
 
         post("/tweets", (request, response) -> {
 
@@ -29,7 +29,6 @@ public class TweetRoute {
                 return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
 
-            System.out.println(request.body());
             Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
             if (TweetValidator.isValid(tweet)) {
                 response.status(200);
