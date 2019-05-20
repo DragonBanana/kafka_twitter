@@ -26,7 +26,7 @@ public class User {
      * The constructor.
      * @param id the identifier of the user.
      */
-    public User(String id) {
+    User(String id) {
         this.id = id;
         subscription = new SubscriptionStub(this);
         virtualClient = new VirtualClient();

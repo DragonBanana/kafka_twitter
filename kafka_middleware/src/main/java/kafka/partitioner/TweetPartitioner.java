@@ -15,14 +15,12 @@ public class TweetPartitioner implements Partitioner {
 
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
-        //TODO
+
         List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
         int numPartitions = partitions.size();
 
         Tweet tweet = new Gson().fromJson((String) value, Tweet.class);
 
-        String author = tweet.getAuthor();
-        int hashAuthor = author.hashCode();
         if(topic.equals(Topic.LOCATION)){
             String location = tweet.getLocation();
             int hashLocation = location.hashCode();

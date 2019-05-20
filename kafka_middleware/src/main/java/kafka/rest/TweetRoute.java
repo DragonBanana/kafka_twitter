@@ -13,24 +13,22 @@ import java.util.stream.Collectors;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
-public class TweetRoute {
+class TweetRoute {
 
-    public static void configureRoutes() {
-
+    static void configureRoutes() {
 
         post("/tweets", (request, response) -> {
-            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567");
-            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
+
             response.header("Access-Control-Allow-Credentials", "true");
             response.type("application/json");
             String id = request.cookie("id");
+
             //Search for the user in the data structure
             if (!Twitter.getTwitter().existUser(id)) {
                 response.status(400);
                 return "{\"type\" : \"error\", \"message\" : \"user does not exist, sign in if you want to post a tweet\"}";
             }
 
-            System.out.println(request.body());
             Tweet tweet = new Gson().fromJson(request.body(), Tweet.class);
             if (TweetValidator.isValid(tweet)) {
                 response.status(200);
@@ -46,8 +44,6 @@ public class TweetRoute {
 
         get("/tweets/*/*/*/latest", (request, response) -> {
 
-            //response.header("Access-Control-Allow-Origin", "http://"+"127.0.0.1"+":"+"4567" + "/*");
-            //response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Allow-Credentials", "true");
 
             String id = request.cookie("id");
@@ -62,11 +58,12 @@ public class TweetRoute {
             response.status(200);
 
             List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
-            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&"))).stream().map(tag -> "#".concat(tag)).collect(Collectors.toList());
-            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map(tag -> "@".concat(tag)).collect(Collectors.toList());
+            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&"))).stream().map("#"::concat).collect(Collectors.toList());
+            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map("@"::concat).collect(Collectors.toList());
+
 
             return new Gson().toJson(new TweetStub().findTweets(id, locations, mentions, tags));
-            //TODO check error in filters
+            //Check error in filters
         });
 
         post("/tweets/subscription/*/*/*", (request, response) -> {
@@ -81,8 +78,8 @@ public class TweetRoute {
             }
 
             List<String> locations = new ArrayList<>(Arrays.asList(request.splat()[0].split("&")));
-            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&"))).stream().map(tag -> "#".concat(tag)).collect(Collectors.toList());
-            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map(tag -> "@".concat(tag)).collect(Collectors.toList());
+            List<String> tags = new ArrayList<>(Arrays.asList(request.splat()[1].split("&"))).stream().map("#"::concat).collect(Collectors.toList());
+            List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map("@"::concat).collect(Collectors.toList());
 
             if (!new TweetStub().subscription(id, locations, tags, mentions)){
                 response.type("application/json");
@@ -93,7 +90,6 @@ public class TweetRoute {
             response.status(200);
 
             return "Start streaming subscriptions";
-            //TODO check error in filters
         });
 
     }

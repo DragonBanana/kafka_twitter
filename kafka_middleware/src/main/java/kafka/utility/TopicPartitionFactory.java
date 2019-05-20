@@ -7,12 +7,12 @@ public class TopicPartitionFactory {
     /**
      * The number of partitions in 'location' topic.
      */
-    public static final int LOCATION_PARTITIONS = 60;
+    private static final int LOCATION_PARTITIONS = 60;
 
     /**
      * The number of partitions in 'tag' topic.
      */
-    public static final int TAG_PARTITIONS = 60;
+    private static final int TAG_PARTITIONS = 60;
 
     /**
      * The partition of the blob storage, where the tweets with composed tags are inserted.
@@ -22,7 +22,7 @@ public class TopicPartitionFactory {
     /**
      * The number of partitions in 'mention' topic.
      */
-    public static final int MENTION_PARTITIONS = 60;
+    private static final int MENTION_PARTITIONS = 60;
 
 
     /**

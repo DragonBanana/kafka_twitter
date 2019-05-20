@@ -17,37 +17,37 @@ public class SubscriptionStub {
         this.subscription = new Subscription(user);
     }
 
-    public String followTag (String tag) {
+    String followTag(String tag) {
         subscription.addTag(tag);
         return tag;
     }
 
-    public String unfollowTag (String tag) {
+    String unfollowTag(String tag) {
         subscription.removeTag(tag);
         return tag;
     }
 
-    public String followUser (String user) {
+    String followUser(String user) {
         subscription.addUser(user);
         return user;
     }
 
-    public String unfollowUser(String user) {
+    String unfollowUser(String user) {
         subscription.removeUser(user);
         return user;
     }
 
-    public String followLocation(String location) {
+    String followLocation(String location) {
         subscription.addLocation(location);
         return location;
     }
 
-    public String unfollowLocation(String location) {
+    String unfollowLocation(String location) {
         subscription.removeLocation(location);
         return location;
     }
 
-    public Long lastPoll(){
+    Long lastPoll() {
         return subscription.getLastPoll();
     }
 
@@ -56,15 +56,15 @@ public class SubscriptionStub {
         return newPoll;
     }
 
-    public List<String> getLocationsFollowed() {
+    List<String> getLocationsFollowed() {
         return new ArrayList<>(subscription.getLocations());
     }
 
-    public List<String> getTagsFollowed() {
+    List<String> getTagsFollowed() {
         return new ArrayList<>(subscription.getTags());
     }
 
-    public List<String> getUsersFollowed() {
+    List<String> getUsersFollowed() {
         return new ArrayList<>(subscription.getFollowedUsers());
     }
 

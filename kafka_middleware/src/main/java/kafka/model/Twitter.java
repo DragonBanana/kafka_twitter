@@ -69,7 +69,6 @@ public class Twitter {
 
     public Deque<User> getUsers() {
         return users;
-        //return new ArrayDeque<>(users);
     }
 
     /**
@@ -87,9 +86,5 @@ public class Twitter {
      */
     public void startSSE(long timestamp) {
         sseCompleted = sseRoutineThread.submit(new SSERoutine(timestamp, new TweetStub()));
-    }
-
-    public ExecutorService getSseRoutineThread() {
-        return sseRoutineThread;
     }
 }
