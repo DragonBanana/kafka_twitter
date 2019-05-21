@@ -154,7 +154,7 @@ public class TweetStubTest {
                 e.printStackTrace();
             }
         });
-        Thread.sleep(5000);
+        Thread.sleep(10000);
         List<Tweet> tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men1"), filter+"@men1");
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));

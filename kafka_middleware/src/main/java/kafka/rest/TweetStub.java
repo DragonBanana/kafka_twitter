@@ -115,11 +115,15 @@ public class TweetStub {
             //filter tweet using users mentioned (and tag if present).
             tweets = findLatestByMentions(id, userToFollow, filter);
 
+        System.out.println("Before filtering");
+        tweets.forEach(System.out::println);
 
         tweets = TweetFilter.filterByLocations(tweets, locationToFollow);
         tweets = TweetFilter.filterByMentions(tweets, userToFollow);
         tweets = TweetFilter.filterByTags(tweets, tagToFollow);
 
+        System.out.println("After filtering");
+        tweets.forEach(System.out::println);
         return tweets;
     }
 
@@ -224,12 +228,17 @@ public class TweetStub {
             ts.clear();
             //Polling the data.
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
+            System.out.println("before find latest");
+            records.forEach(System.out::println);
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-                if (t.getTags().stream().anyMatch(tags::contains))
+                if (t.getTags().stream().anyMatch(tags::contains)) {
                     ts.add(t);
+                }
             });
+            System.out.println("after find latest");
+            ts.forEach(System.out::println);
             tweets.addAll(ts);
         } while (!ts.isEmpty());
         topicPartitions.forEach(topicPartition -> {
@@ -284,12 +293,17 @@ public class TweetStub {
             ts.clear();
             //Polling the data.
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
+            System.out.println("before find latest");
+            records.forEach(System.out::println);
+
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
                 if (t.getMentions().stream().anyMatch(mentions::contains))
                     ts.add(t);
             });
+            System.out.println("after find latest");
+            ts.forEach(System.out::println);
             tweets.addAll(ts);
         } while (!ts.isEmpty());
         topicPartitions.forEach(topicPartition -> {

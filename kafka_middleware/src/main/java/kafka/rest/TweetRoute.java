@@ -62,6 +62,7 @@ class TweetRoute {
             List<String> mentions = new ArrayList<>(Arrays.asList(request.splat()[2].split("&"))).stream().map("@"::concat).collect(Collectors.toList());
 
 
+
             return new Gson().toJson(new TweetStub().findTweets(id, locations, mentions, tags));
             //Check error in filters
         });

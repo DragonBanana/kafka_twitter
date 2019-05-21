@@ -58,6 +58,16 @@ public class SSERoutine implements Runnable {
                 //filter duplicate tweets
                 tweets = tweets.stream().distinct().collect(Collectors.toList());
 
+                System.out.println("Location ");
+                locationsFollowed.forEach(System.out::println);
+                System.out.println("tag");
+                tagsFollowed.forEach(System.out::println);
+                System.out.println("mention");
+                usersFollowed.forEach(System.out::println);
+
+                System.out.println("tweets ");
+                tweets.forEach(tweet -> System.out.println(tweet.getContent()));
+                System.out.println("end tweets ");
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
                 user.notityTweets(tweets);
 
