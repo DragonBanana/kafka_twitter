@@ -29,8 +29,18 @@ $(document).ready(function () {
             path: "/"
         });
         LoggedIn = true;
-        if (LoggedIn)
+        if (LoggedIn){
             $("#login").text("Ciao " + username);
+            var buttonLogin = document.getElementById("button-login");
+            var buttonLogout = document.getElementById("button-logout");
+            buttonLogout.style.display = "block";
+            buttonLogin.style.display = "none";
+        }
+        
+    }
+
+    logout = function(){
+        location.reload(); 
     }
 
 

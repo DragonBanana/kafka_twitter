@@ -9,7 +9,8 @@ body {
 
 li {
   margin-right: 2.5rem;
-}
+
+  list-style-type:none;}
 
 .timeline {
   list-style: none;
@@ -158,4 +159,7 @@ li {
 
 .timeline-body>p+p {
   margin-top: 5px;
+}
+button#button-logout{
+  display: none;
 }
