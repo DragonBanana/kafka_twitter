@@ -202,12 +202,15 @@ public class TweetStub {
         Consumer<String, String> consumer = ConsumerFactory.getConsumer();
         //Declaring two partitions: the first for 1 tag search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
-        if (tags.size() == 1) {
+        //if (tags.size() == 1) {
+        tags.forEach(t ->{
             //Getting the partition of the topic.
-            int partition = TopicPartitionFactory.getTagPartition(tags.get(0));
+            System.out.println("tag to partition: " + t);
+            int partition = TopicPartitionFactory.getTagPartition(t);
             //Creating the topic partition object (it is required in the next instructions).
             topicPartitions.add(new TopicPartition(topic, partition));
-        }
+        });
+        //}
         //Getting the partition of the topic.
         int partition = TopicPartitionFactory.TAG_PARTITION_BLOB;
         //Creating the topic partition object (it is required in the next instructions).
@@ -219,6 +222,7 @@ public class TweetStub {
                     //Getting the offset from the db.
                     long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
                     //Moving the offset.
+                    System.out.println("tag offset to seek: " + offset);
                     consumer.seek(topicPartition, offset);
 
                 });
@@ -268,12 +272,16 @@ public class TweetStub {
         Consumer<String, String> consumer = ConsumerFactory.getConsumer();
         //Declaring two partitions: the first for 1 mention search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
-        if (mentions.size() == 1) {
+        System.out.println("mentions size: " + mentions.size());
+        //if (mentions.size() == 1) {
+        mentions.forEach(m ->{
             //Getting the partition of the topic.
-            int partition = TopicPartitionFactory.getMentionPartition(mentions.get(0));
+            System.out.println("mention to partition: " + m);
+            int partition = TopicPartitionFactory.getMentionPartition( m);
             //Creating the topic partition object (it is required in the next instructions).
             topicPartitions.add(new TopicPartition(topic, partition));
-        }
+        });
+        //}
         //Getting the partition of the topic.
         int partition = TopicPartitionFactory.MENTION_PARTITION_BLOB;
         //Creating the topic partition object (it is required in the next instructions).
@@ -284,6 +292,7 @@ public class TweetStub {
                 .forEach(topicPartition -> {
                     //Getting the offset from the db.
                     long offset = new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset();
+                    System.out.println("Mention offset to seek: " + offset);
                     //Moving the offset.
                     consumer.seek(topicPartition, offset);
                 });
