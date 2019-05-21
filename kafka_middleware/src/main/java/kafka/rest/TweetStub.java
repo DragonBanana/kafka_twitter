@@ -152,7 +152,7 @@ public class TweetStub {
         //Polling the data.
         do {
             ts.clear();
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
             //Transforming data and filtering. (!Only by location)
             ts = records.records(topicPartition).stream().map(record -> new Gson().fromJson(record.value(), Tweet.class)).filter(t -> t.getLocation().equals(location)).collect(Collectors.toList());
             tweets.addAll(ts);
@@ -223,7 +223,7 @@ public class TweetStub {
         do {
             ts.clear();
             //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
@@ -283,7 +283,7 @@ public class TweetStub {
         do {
             ts.clear();
             //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
             //Transforming data and filtering. (!Only by tag)
             records.forEach(record -> {
                 Tweet t = new Gson().fromJson(record.value(), Tweet.class);
