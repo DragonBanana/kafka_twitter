@@ -45,18 +45,30 @@ public class SSERoutine implements Runnable {
 
                 //poll()
 
-                List<Tweet> tweets = new ArrayList<>();
+                final List<Tweet> tweets = new ArrayList<>();
                 if (!locationsFollowed.isEmpty())
-                    tweets.addAll(tweetStub.findTweets(user.getId(), locationsFollowed, Collections.singletonList("@all"), Collections.singletonList("#all")));
+                    locationsFollowed.forEach(location -> tweets.addAll(tweetStub.findTweets(user.getId(),
+                            Collections.singletonList(location),
+                            Collections.singletonList("@all"),
+                            Collections.singletonList("#all"))));
+                    System.out.println(tweets.size());
                 if (!tagsFollowed.isEmpty()) {
-                    tweets.addAll(tweetStub.findTweets(user.getId(), Collections.singletonList("all"), Collections.singletonList("@all"), tagsFollowed));
+                    tagsFollowed.forEach(tag -> tweets.addAll(tweetStub.findTweets(user.getId(),
+                            Collections.singletonList("all"),
+                            Collections.singletonList("@all"),
+                            Collections.singletonList(tag))));
+                    System.out.println(tweets.size());
                 }
                 if (!usersFollowed.isEmpty()) {
-                    tweets.addAll(tweetStub.findTweets(user.getId(), Collections.singletonList("all"), usersFollowed, Collections.singletonList("#all")));
+                    usersFollowed.forEach(mention -> tweets.addAll(tweetStub.findTweets(user.getId(),
+                            Collections.singletonList("all"),
+                            Collections.singletonList(mention),
+                            Collections.singletonList("#all"))));
+                    System.out.println(tweets.size());
                 }
 
                 //filter duplicate tweets
-                tweets = tweets.stream().distinct().collect(Collectors.toList());
+                final List<Tweet> ts = tweets.stream().distinct().collect(Collectors.toList());
 
                 System.out.println("Location ");
                 locationsFollowed.forEach(System.out::println);
@@ -66,10 +78,10 @@ public class SSERoutine implements Runnable {
                 usersFollowed.forEach(System.out::println);
 
                 System.out.println("tweets ");
-                tweets.forEach(tweet -> System.out.println(tweet.getContent()));
+                ts.forEach(tweet -> System.out.println(tweet.getContent()));
                 System.out.println("end tweets ");
                 LoggerFactory.getLogger(TwitterRest.class).info("size" + users.size());
-                user.notityTweets(tweets);
+                user.notityTweets(ts);
 
                 //update poll
                 subscription.updatePoll(timestamp);

@@ -1,6 +1,7 @@
 package kafka.model;
 
 import com.google.gson.Gson;
+import kafka.utility.TweetValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,15 +125,20 @@ public class Tweet {
         return result;
     }
 
-    public boolean equals(Tweet t) {
-        return t.getTags().containsAll(this.getTags()) &&
-                this.getTags().containsAll(t.getTags()) &&
-                t.getMentions().containsAll(this.getMentions()) &&
-                this.getMentions().containsAll(t.getMentions()) &&
-                t.getLocation().equals(this.getLocation()) &&
-                t.getAuthor().equals(this.getAuthor()) &&
-                t.getContent().equals(this.getContent()) &&
-                t.getTimestamp().equals(this.getTimestamp());
+    public boolean equals(Object o) {
+        Tweet t;
+        if(o instanceof Tweet) {
+            t = (Tweet) o;
+            return t.getTags().containsAll(this.getTags()) &&
+                    this.getTags().containsAll(t.getTags()) &&
+                    t.getMentions().containsAll(this.getMentions()) &&
+                    this.getMentions().containsAll(t.getMentions()) &&
+                    t.getLocation().equals(this.getLocation()) &&
+                    t.getAuthor().equals(this.getAuthor()) &&
+                    t.getContent().equals(this.getContent()) &&
+                    t.getTimestamp().equals(this.getTimestamp());
+        }
+        return false;
     }
 
     public int hashCode() {
