@@ -20,9 +20,6 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import static jdk.vm.ci.sparc.SPARC.l1;
-import static jdk.vm.ci.sparc.SPARC.l2;
-
 public class TweetStub {
 
     /**
@@ -264,6 +261,7 @@ public class TweetStub {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         return totalTweets;
+
     }
 
     /**

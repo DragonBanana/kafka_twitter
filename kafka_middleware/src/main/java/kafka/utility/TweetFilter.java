@@ -2,6 +2,8 @@ package kafka.utility;
 
 import kafka.model.Tweet;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,12 +11,13 @@ public class TweetFilter {
 
     /**
      * Filters a list of tweets by their locations.
-     * @param tweets the list of tweets to be filtered.
+     *
+     * @param tweets    the list of tweets to be filtered.
      * @param locations the locations.
      * @return the list of tweets filtered my locations.
      */
     public static List<Tweet> filterByLocations(List<Tweet> tweets, List<String> locations) {
-        if(locations.isEmpty()) {
+        if (locations.isEmpty()) {
             return tweets;
         }
         return tweets.stream()
@@ -25,12 +28,13 @@ public class TweetFilter {
 
     /**
      * Filters a list of tweets by their tags.
+     *
      * @param tweets the list of tweets to be filtered.
-     * @param tags the tags.
+     * @param tags   the tags.
      * @return the list of tweets filtered my tags.
      */
     public static List<Tweet> filterByTags(List<Tweet> tweets, List<String> tags) {
-        if(!tags.isEmpty())
+        if (!tags.isEmpty())
             return tweets.stream()
                     .filter(t -> tags.stream()
                             .anyMatch(tag -> t.getTags().stream()
@@ -41,12 +45,13 @@ public class TweetFilter {
 
     /**
      * Filters a list of tweets by their mentions.
-     * @param tweets the list of tweets to be filtered.
+     *
+     * @param tweets   the list of tweets to be filtered.
      * @param mentions the mentions.
      * @return the list of tweets filtered my mentions.
      */
     public static List<Tweet> filterByMentions(List<Tweet> tweets, List<String> mentions) {
-        if(!mentions.isEmpty())
+        if (!mentions.isEmpty())
             return tweets.stream()
                     .filter(t -> mentions.stream()
                             .anyMatch(mention -> t.getMentions().stream()
@@ -55,4 +60,11 @@ public class TweetFilter {
         return tweets;
     }
 
+
+    public static List<Tweet> sort(List<Tweet> list1, List<Tweet> list2) {
+        list1.addAll(list2);
+
+        list1.sort(Comparator.comparingLong((Tweet t) -> Long.parseLong(t.getTimestamp())));
+        return list1;
+    }
 }
