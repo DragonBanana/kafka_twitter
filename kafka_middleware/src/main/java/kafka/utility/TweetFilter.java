@@ -61,10 +61,55 @@ public class TweetFilter {
     }
 
 
-    public static List<Tweet> sort(List<Tweet> list1, List<Tweet> list2) {
+    public static List<Tweet> sort1(List<Tweet> list1, List<Tweet> list2) {
         list1.addAll(list2);
 
         list1.sort(Comparator.comparingLong((Tweet t) -> Long.parseLong(t.getTimestamp())));
         return list1;
+    }
+
+    public static List<Tweet> sort(List<Tweet> list1, List<Tweet> list2) {
+        List<Tweet> t1;
+        List<Tweet> t2;
+        List<Tweet> result = new ArrayList<>();
+
+        //Check that the lists are not empty
+        if (list1.isEmpty() && list2.isEmpty())
+            return result;
+        if (list1.isEmpty())
+            return list2;
+        if (list2.isEmpty())
+            return list1;
+
+        if (list1.size() > list2.size()) {
+            t1 = list1;
+            t2 = list2;
+        } else {
+            t2 = list1;
+            t1 = list2;
+        }
+
+        Long upperBound;
+        Long currentValue = Long.parseLong(t2.get(0).getTimestamp());
+
+        for (Tweet tweet : t1) {
+            upperBound = Long.parseLong(tweet.getTimestamp());
+
+            if (!t2.isEmpty() && upperBound > currentValue) {
+                result.add(t2.get(0));
+                t2.remove(0);
+                currentValue = Long.parseLong(t2.get(0).getTimestamp());
+            }
+
+            result.add(tweet);
+
+        }
+
+        if (!t2.isEmpty()) {
+            result.addAll(t2);
+            t2.clear();
+        }
+
+        return result;
     }
 }

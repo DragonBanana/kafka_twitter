@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -167,11 +166,11 @@ public class TweetFilterTest {
         List<Tweet> list1 = new ArrayList<>();
         List<Tweet> list2 = new ArrayList<>();
 
-        for (int i = 15; i < 21; i++) {
+        for (int i = 1; i < 23; i++) {
             list2.add(new Tweet("Luca", "aaa", Long.toString(i), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
         }
 
-        for (int i = 1; i < 20; i++) {
+        for (int i = 9; i < 30; i++) {
             list1.add(new Tweet("Luca", "aaa", Long.toString(i), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
         }
 
@@ -182,7 +181,5 @@ public class TweetFilterTest {
         list2.forEach(tweet -> System.out.printf("%s ", tweet.getTimestamp()));
         System.out.println();
         result.forEach(tweet -> System.out.printf("%s ", tweet.getTimestamp()));
-
-
     }
 }
