@@ -140,8 +140,7 @@ public class TweetStub {
         String topic = Topic.LOCATION;
         //Getting the consumer.
         //TODO: make consumer group id unique
-        List<Consumer> consumers = (List<Consumer>) ConsumerFactory.getConsumers(topic,"consumer-group");
-
+        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,"consumer-group");
 
         /*
         ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -225,7 +224,7 @@ public class TweetStub {
         String topic = Topic.TAG;
         //TODO: make consumer group id unique
 
-        List<Consumer<String, String>> consumers = ConsumerFactory.getConsumers(topic,"consumer-group");
+        List<Consumer<String, String>> consumers = ConsumerFactory.getConsumerGroup(topic,"consumer-group");
 
         List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
             consumer.poll(Duration.ofMillis(0));
@@ -280,7 +279,7 @@ public class TweetStub {
         //The topic we are reading from.
         String topic = Topic.MENTION;
         //TODO: make consumer group id unique
-        List<Consumer> consumers = (List<Consumer>) ConsumerFactory.getConsumers(topic,"consumer-group");
+        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,"consumer-group");
 
         List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
             consumer.poll(Duration.ofMillis(0));
