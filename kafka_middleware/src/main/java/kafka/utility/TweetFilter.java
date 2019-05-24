@@ -76,10 +76,14 @@ public class TweetFilter {
         //Check that the lists are not empty
         if (list1.isEmpty() && list2.isEmpty())
             return result;
-        if (list1.isEmpty())
-            return list2;
-        if (list2.isEmpty())
-            return list1;
+        if (list1.isEmpty()) {
+            result.addAll(list2);
+            return result;
+        }
+        if (list2.isEmpty()) {
+            result.addAll(list1);
+            return result;
+        }
 
         if (list1.size() > list2.size()) {
             t1 = list1;
@@ -89,22 +93,26 @@ public class TweetFilter {
             t1 = list2;
         }
 
-        Long upperBound;
-        Long currentValue = Long.parseLong(t2.get(0).getTimestamp());
+        long upperBound;
+        long currentValue = Long.parseLong(t2.get(0).getTimestamp());
 
         for (Tweet tweet : t1) {
             upperBound = Long.parseLong(tweet.getTimestamp());
 
             if (!t2.isEmpty() && upperBound > currentValue) {
+                //if upperbound is greater than current value add the element of the second list to the result
                 result.add(t2.get(0));
                 t2.remove(0);
-                currentValue = Long.parseLong(t2.get(0).getTimestamp());
+
+                if (!t2.isEmpty())
+                    currentValue = Long.parseLong(t2.get(0).getTimestamp());
             }
 
+            //add the element of the first list anyway
             result.add(tweet);
-
         }
 
+        //if there are some elements greater than the last element of t1 addAll in the tail
         if (!t2.isEmpty()) {
             result.addAll(t2);
             t2.clear();
