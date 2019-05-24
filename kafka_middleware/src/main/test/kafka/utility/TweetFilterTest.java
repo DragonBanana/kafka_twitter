@@ -28,11 +28,11 @@ public class TweetFilterTest {
         mentions1.add("@men2");
         mentions1.add("@men3");
         tweetList.add(new Tweet("author1",
-                        "content1",
-                        "ts1",
-                        "loc1",
-                        tags1,
-                        mentions1));
+                "content1",
+                "ts1",
+                "loc1",
+                tags1,
+                mentions1));
         List<String> tags2 = new ArrayList<>();
         tags2.add("#tag2");
         tags2.add("#tag3");
@@ -174,12 +174,262 @@ public class TweetFilterTest {
             list1.add(new Tweet("Luca", "aaa", Long.toString(i), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
         }
 
-        List<Tweet> result = TweetFilter.sort(list1,list2);
+        List<Tweet> result = TweetFilter.sort1(list1, list2);
 
         list1.forEach(tweet -> System.out.printf("%s ", tweet.getTimestamp()));
         System.out.println();
         list2.forEach(tweet -> System.out.printf("%s ", tweet.getTimestamp()));
         System.out.println();
         result.forEach(tweet -> System.out.printf("%s ", tweet.getTimestamp()));
+    }
+
+    @Test
+    public void bench_sort1_1000_1000() {
+        long k = 100000000;
+        int n = 1000;
+        int m = 1000;
+        int exec = 1000;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort1(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort1_10000_10000() {
+        long k = 100000000;
+        int n = 10000;
+        int m = 10000;
+        int exec = 1000;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort1(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort1_100000_100000() {
+        long k = 100000000;
+        int n = 100000;
+        int m = 100000;
+        int exec = 100;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort1(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort1_1000000_1000000() {
+        long k = 100000000;
+        int n = 1000000;
+        int m = 1000000;
+        int exec = 10;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort1(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort1_1000_1000000() {
+        long k = 100000000;
+        int n = 100;
+        int m = 1000000;
+        int exec = 10;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort1(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort_1000_1000() {
+        long k = 100000000;
+        int n = 1000;
+        int m = 1000;
+        int exec = 1000;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort_10000_10000() {
+        long k = 100000000;
+        int n = 10000;
+        int m = 10000;
+        int exec = 1000;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort_100000_100000() {
+        long k = 100000000;
+        int n = 100000;
+        int m = 100000;
+        int exec = 100;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort_1000000_1000000() {
+        long k = 100000000;
+        int n = 1000000;
+        int m = 1000000;
+        int exec = 10;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
+    }
+
+    @Test
+    public void bench_sort_1000_1000000() {
+        long k = 100000000;
+        int n = 100;
+        int m = 1000000;
+        int exec = 10;
+        List<Long> times = new ArrayList<>();
+        for (int l = 0; l < exec; l++) {
+            List<Tweet> list1 = new ArrayList<>();
+            List<Tweet> list2 = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                list2.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            for (int i = 0; i < m; i++) {
+                list1.add(new Tweet("Luca", "aaa", Long.toString((long) (Math.random() * k)), "a", Collections.singletonList("aa"), Collections.singletonList("aa")));
+            }
+            long startTime = System.currentTimeMillis();
+            List<Tweet> result = TweetFilter.sort(list1, list2);
+            long endTime = System.currentTimeMillis();
+            times.add(endTime - startTime);
+        }
+        double averageTime = times.stream().mapToLong(l -> l).average().getAsDouble();
+        System.out.println(averageTime);
     }
 }

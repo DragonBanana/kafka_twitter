@@ -3,7 +3,6 @@
  import org.apache.kafka.clients.consumer.Consumer;
  import org.apache.kafka.clients.consumer.ConsumerConfig;
  import org.apache.kafka.clients.consumer.KafkaConsumer;
- import org.apache.kafka.common.TopicPartition;
  import org.apache.kafka.common.serialization.StringDeserializer;
 
  import java.time.Duration;
@@ -35,16 +34,17 @@
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, "org.apache.kafka.clients.consumer.RoundRobinAssignor");
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100000");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         List<Consumer<String, String>> consumerList = new ArrayList<>();
         for(int i = 0; i < N_CONSUMER; i++) {
-            consumerList.add(new KafkaConsumer<>(getDefaultProperty()));
+            consumerList.add(new KafkaConsumer<>(props));
         }
-        consumerList.forEach(c -> {
+        consumerList.parallelStream().forEach(c -> {
             c.subscribe(Collections.singletonList(topic));
-            c.poll(Duration.ofMillis(0));
+            c.poll(Duration.ofMillis(1000));
         });
         return consumerList;
     }
