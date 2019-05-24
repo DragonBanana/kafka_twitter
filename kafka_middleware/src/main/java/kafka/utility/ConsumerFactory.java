@@ -30,7 +30,7 @@
      */
     public static List<Consumer<String, String>> getConsumerGroup(String topic, String groupId) {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32778");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32782");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -56,7 +56,7 @@
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32778");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32782");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");

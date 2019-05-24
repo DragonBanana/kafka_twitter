@@ -32,7 +32,7 @@ public class ConsumerFactoryTest {
      */
     @Test
     public void getConsumers() {
-        for(int i = 0; i < 50; i++) {
+        for(int i = 0; i < 5; i++) {
             List<Consumer<String, String>> consumers = ConsumerFactory.getConsumerGroup("location", "group-0");
             List<Integer> list = consumers
                     .stream()
