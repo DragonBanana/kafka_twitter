@@ -13,9 +13,11 @@ import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
 
+import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -128,16 +130,19 @@ public class TweetStub {
      * Return the latest tweet filtered by location.
      *
      * @param id       the identifier of the requester.
-     * @param location the location.
+     * @param locations the locations.
      * @param filter   the filters for the research.
      * @return the latest tweet filtered by location.
      */
-    private List<Tweet> findLatestByLocation(String id, String location, String filter) {
+    List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
         //The topic we are reading from.
         String topic = Topic.LOCATION;
         //Getting the consumer.
         //TODO: make consumer group id unique
-        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,"consumer-group");
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,generatedString);
 
         /*
         ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -153,11 +158,12 @@ public class TweetStub {
             }
         });*/
         List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
-            consumer.poll(Duration.ofMillis(0));
+            //consumer.poll(Duration.ofMillis(0));
             Set<TopicPartition> partitions = consumer.assignment();
             partitions.forEach(part -> {
                 long offset = new AzureDBConn().get(new OffsetKey(id, filter, part.partition())).getValue().getOffset();
                 //Moving the offset.
+                System.out.println("consumer: " + consumer + " partition: " + part + " offset: " + offset);
                 consumer.seek(part, offset);
             });
             List<Tweet> ts = new ArrayList<>();
@@ -166,12 +172,14 @@ public class TweetStub {
             //Polling the data.
             do {
                 ts.clear();
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
                 //Transforming data and filtering. (!Only by location)
 
                 records.forEach(record -> {
+                    System.out.println("record: " + record.value());
                     Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-                    if (t.getLocation().equals(location)) {
+                    if (locations.contains(t.getLocation())){
+                        System.out.println("twitter content: " + t.getContent());
                         ts.add(t);
                     }
                 });
@@ -181,13 +189,15 @@ public class TweetStub {
             //Getting the new offset.
             partitions.forEach(part ->{
                 long offset = consumer.position(part);
+                System.out.println("part: " + part + " new offset: " + offset);
                 //Saving the new offset for EOS.
                 new AzureDBConn().put(new Offset(id, filter, part.partition(), offset));
             });
 
             return tweets;
-        }).flatMap(List::stream)
-                .collect(Collectors.toList());
+        }).reduce((l1,l2) -> {
+            return TweetFilter.sort(l1,l2);
+        }).orElseGet(null);
         return totalTweets;
     }
 
@@ -199,7 +209,8 @@ public class TweetStub {
      * @param filter    the filters for the research.
      * @return the latest tweet filtered by location.
      */
-    List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
+    /*List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
+        locations.forEach(l-> System.out.println("location: " + l));
         return locations.stream()
                 .map(l -> findLatestByLocation(id, l, filter))
                 .reduce((l1, l2) -> {
@@ -207,7 +218,7 @@ public class TweetStub {
                     return l1;
                 }).orElseGet(null);
     }
-
+    */
     /**
      * Return the latest tweet filtered by tags.
      *
@@ -220,8 +231,11 @@ public class TweetStub {
         //The topic we are reading from.
         String topic = Topic.TAG;
         //TODO: make consumer group id unique
-
-        List<Consumer<String, String>> consumers = ConsumerFactory.getConsumerGroup(topic,"consumer-group");
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,generatedString);
+        //List<Consumer<String, String>> consumers = ConsumerFactory.getConsumerGroup(topic,"consumer-group");
 
         List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
             consumer.poll(Duration.ofMillis(0));
@@ -229,6 +243,7 @@ public class TweetStub {
             partitions.forEach(part -> {
                 long offset = new AzureDBConn().get(new OffsetKey(id, filter, part.partition())).getValue().getOffset();
                 //Moving the offset.
+                System.out.println("consumer: " + consumer + " partition: " + part + " offset: " + offset);
                 consumer.seek(part, offset);
             });
             List<Tweet> ts = new ArrayList<>();
@@ -241,8 +256,10 @@ public class TweetStub {
                 //Transforming data and filtering. (!Only by tag)
 
                 records.forEach(record -> {
+                    System.out.println("record: " + record.value());
                     Tweet t = new Gson().fromJson(record.value(), Tweet.class);
                     if (t.getTags().stream().anyMatch(tags::contains)) {
+                        System.out.println("twitter content: " + t.getContent());
                         ts.add(t);
                     }
                 });
@@ -253,13 +270,14 @@ public class TweetStub {
             partitions.forEach(part ->{
                 long offset = consumer.position(part);
                 //Saving the new offset for EOS.
+                System.out.println("part: " + part + " new offset: " + offset);
                 new AzureDBConn().put(new Offset(id, filter, part.partition(), offset));
             });
 
             return tweets;
-        })
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        }).reduce((l1,l2) -> {
+            return TweetFilter.sort(l1,l2);
+        }).orElseGet(null);
         return totalTweets;
 
     }
@@ -277,7 +295,11 @@ public class TweetStub {
         //The topic we are reading from.
         String topic = Topic.MENTION;
         //TODO: make consumer group id unique
-        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,"consumer-group");
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+        List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,generatedString);
+        //List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,"consumer-group");
 
         List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
             consumer.poll(Duration.ofMillis(0));
@@ -285,6 +307,7 @@ public class TweetStub {
             partitions.forEach(part -> {
                 long offset = new AzureDBConn().get(new OffsetKey(id, filter, part.partition())).getValue().getOffset();
                 //Moving the offset.
+                System.out.println("consumer: " + consumer + " partition: " + part + " offset: " + offset);
                 consumer.seek(part, offset);
             });
             List<Tweet> ts = new ArrayList<>();
@@ -297,8 +320,10 @@ public class TweetStub {
                 //Transforming data and filtering. (!Only by mention)
 
                 records.forEach(record -> {
+                    System.out.println("record: " + record.value());
                     Tweet t = new Gson().fromJson(record.value(), Tweet.class);
                     if (t.getMentions().stream().anyMatch(mentions::contains)) {
+                        System.out.println("twitter content: " + t.getContent());
                         ts.add(t);
                     }
                 });
@@ -309,14 +334,16 @@ public class TweetStub {
             partitions.forEach(part ->{
                 long offset = consumer.position(part);
                 //Saving the new offset for EOS.
+                System.out.println("part: " + part + " new offset: " + offset);
                 new AzureDBConn().put(new Offset(id, filter, part.partition(), offset));
             });
 
             return tweets;
-        })
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        }).reduce((l1,l2) -> {
+            return TweetFilter.sort(l1,l2);
+        }).orElseGet(null);
         return totalTweets;
+
     }
 
     public boolean subscription(String id, List<String> locations, List<String> tags, List<String> mentions) {
