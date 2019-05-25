@@ -1,5 +1,6 @@
  package kafka.utility;
 
+ import kafka.model.Topic;
  import org.apache.kafka.clients.consumer.Consumer;
  import org.apache.kafka.clients.consumer.ConsumerConfig;
  import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -14,6 +15,10 @@
      * The number of consumer per group.
      */
     private static final int N_CONSUMER = 3;
+
+    private static List<Consumer<String, String>> locationSubscribers;
+    private static List<Consumer<String, String>> tagSubscribers;
+    private static List<Consumer<String, String>> mentionSubscribers;
 
     /**
      * Return the consumer.
@@ -49,6 +54,41 @@
         return consumerList;
     }
 
+     /**
+      * Returns a list of consumers in the same consumer group.
+      * @return a list of consumers in the same consumer group.
+      */
+     public static List<Consumer<String, String>> getSubscribeConsumerGroup(String topic) {
+         if(topic.equals(Topic.LOCATION)) {
+             if (locationSubscribers == null) {
+                 locationSubscribers = getConsumerGroup(topic, "loc-subscriber-group");
+             }
+             return locationSubscribers;
+         } else if(topic.equals(Topic.TAG)) {
+             if (tagSubscribers == null) {
+                 tagSubscribers = getConsumerGroup(topic, "tag-subscriber-group");
+             }
+             return tagSubscribers;
+         } else if(topic.equals(Topic.MENTION)) {
+             if (mentionSubscribers == null) {
+                 mentionSubscribers = getConsumerGroup(topic, "men-subscriber-group");
+             }
+             return mentionSubscribers;
+         }
+         return null;
+     }
+
+     /**
+      * Returns a list of consumers in the same consumer group.
+      * @return a list of consumers in the same consumer group.
+      */
+     public static List<Consumer<String, String>> getAllSubscribeConsumerGroup() {
+         List<Consumer<String, String>> list = new ArrayList<>();
+         list.addAll(locationSubscribers);
+         list.addAll(tagSubscribers);
+         list.addAll(mentionSubscribers);
+         return list;
+     }
 
     /**
      * Return the default producer properties.
