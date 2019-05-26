@@ -47,20 +47,20 @@ public class SSERoutine implements Runnable {
 
                 final List<Tweet> tweets = new ArrayList<>();
                 if (!locationsFollowed.isEmpty())
-                    locationsFollowed.forEach(location -> tweets.addAll(tweetStub.findTweets(user.getId(),
+                    locationsFollowed.forEach(location -> tweets.addAll(tweetStub.findTweetsSubscription(user.getId(),
                             Collections.singletonList(location),
                             Collections.singletonList("@all"),
                             Collections.singletonList("#all"))));
                     System.out.println(tweets.size());
                 if (!tagsFollowed.isEmpty()) {
-                    tagsFollowed.forEach(tag -> tweets.addAll(tweetStub.findTweets(user.getId(),
+                    tagsFollowed.forEach(tag -> tweets.addAll(tweetStub.findTweetsSubscription(user.getId(),
                             Collections.singletonList("all"),
                             Collections.singletonList("@all"),
                             Collections.singletonList(tag))));
                     System.out.println(tweets.size());
                 }
                 if (!usersFollowed.isEmpty()) {
-                    usersFollowed.forEach(mention -> tweets.addAll(tweetStub.findTweets(user.getId(),
+                    usersFollowed.forEach(mention -> tweets.addAll(tweetStub.findTweetsSubscription(user.getId(),
                             Collections.singletonList("all"),
                             Collections.singletonList(mention),
                             Collections.singletonList("#all"))));

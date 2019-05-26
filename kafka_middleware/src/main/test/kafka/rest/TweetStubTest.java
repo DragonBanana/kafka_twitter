@@ -1,7 +1,9 @@
 package kafka.rest;
 
 import com.google.gson.Gson;
+import kafka.model.Topic;
 import kafka.model.Tweet;
+import kafka.utility.ConsumerFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -83,8 +85,8 @@ public class TweetStubTest {
             e.printStackTrace();
         }
         //tweetStub.save(new Tweet("luca", "Hello from the stub", "now","verona", tags1, mentions ));
-        tweetStub.findLatestByTags("luca", Collections.singletonList("#swag"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
-        tweetStub.findLatestByLocations("luca", Collections.singletonList("verona"), "nofilters").forEach(t -> System.out.println(new Gson().toJson(t)));
+        tweetStub.findLatestByTags("luca", Collections.singletonList("#swag"), "nofilters", ConsumerFactory.getConsumerGroup(Topic.TAG, "luca")).forEach(t -> System.out.println(new Gson().toJson(t)));
+        tweetStub.findLatestByLocations("luca", Collections.singletonList("verona"), "nofilters", ConsumerFactory.getConsumerGroup(Topic.MENTION, "luca")).forEach(t -> System.out.println(new Gson().toJson(t)));
         //System.out.println(tweetStub.findLatestByLocation("luca", "verona", "nofilters").size());
     }
 
@@ -98,15 +100,15 @@ public class TweetStubTest {
             }
         });
         Thread.sleep(5000);
-        List<Tweet> tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc1"), filter);
+        List<Tweet> tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc1"), filter, ConsumerFactory.getConsumerGroup(Topic.LOCATION, id));
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
 
-        tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc2"), filter);
+        tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc2"), filter, ConsumerFactory.getConsumerGroup(Topic.LOCATION, id));
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
 
-        tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc3"), filter);
+        tweets = new TweetStub().findLatestByLocations(id, Collections.singletonList("loc3"), filter, ConsumerFactory.getConsumerGroup(Topic.LOCATION, id));
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
     }
@@ -121,24 +123,24 @@ public class TweetStubTest {
             }
         });
         Thread.sleep(5000);
-        List<Tweet> tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag1"), filter+"#tag1");
+        List<Tweet> tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag1"), filter + "#tag1", ConsumerFactory.getConsumerGroup(Topic.TAG, id));
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
 
-        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag2"), filter+"#tag2");
+        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag2"), filter + "#tag2", ConsumerFactory.getConsumerGroup(Topic.TAG, id));
         assertTrue(tweets.size() > 1);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
         assertTrue(tweets.stream().noneMatch(t -> t.equals(tweetList.get(2))));
 
 
-        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag3"), filter+"#tag3");
+        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag3"), filter + "#tag3", ConsumerFactory.getConsumerGroup(Topic.TAG, id));
         assertTrue(tweets.size() > 2);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
 
-        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag4"), filter+"#tag4");
+        tweets = new TweetStub().findLatestByTags(id, Collections.singletonList("#tag4"), filter + "#tag4", ConsumerFactory.getConsumerGroup(Topic.TAG, id));
         assertTrue(tweets.size() > 1);
         assertTrue(tweets.stream().noneMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
@@ -155,24 +157,24 @@ public class TweetStubTest {
             }
         });
         Thread.sleep(10000);
-        List<Tweet> tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men1"), filter+"@men1");
+        List<Tweet> tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men1"), filter + "@men1", ConsumerFactory.getConsumerGroup(Topic.MENTION, id));
         assertTrue(tweets.size() > 0);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
 
-        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men2"), filter+"@men2");
+        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men2"), filter + "@men2", ConsumerFactory.getConsumerGroup(Topic.MENTION, id));
         assertTrue(tweets.size() > 1);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
         assertTrue(tweets.stream().noneMatch(t -> t.equals(tweetList.get(2))));
 
 
-        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men3"), filter+"@men3");
+        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men3"), filter + "@men3", ConsumerFactory.getConsumerGroup(Topic.MENTION, id));
         assertTrue(tweets.size() > 2);
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(2))));
 
-        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men4"), filter+"@men4");
+        tweets = new TweetStub().findLatestByMentions(id, Collections.singletonList("@men4"), filter + "@men4", ConsumerFactory.getConsumerGroup(Topic.MENTION, id));
         assertTrue(tweets.size() > 1);
         assertTrue(tweets.stream().noneMatch(t -> t.equals(tweetList.get(0))));
         assertTrue(tweets.stream().anyMatch(t -> t.equals(tweetList.get(1))));

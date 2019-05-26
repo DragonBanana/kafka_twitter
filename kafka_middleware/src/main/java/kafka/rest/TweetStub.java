@@ -3,7 +3,9 @@ package kafka.rest;
 import com.google.gson.Gson;
 import kafka.db.AzureDBConn;
 import kafka.model.*;
-import kafka.utility.*;
+import kafka.utility.ConsumerFactory;
+import kafka.utility.ProducerFactory;
+import kafka.utility.TweetFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -13,14 +15,11 @@ import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.ProducerFencedException;
 
-import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutionException;
 
 public class TweetStub {
 
@@ -75,8 +74,7 @@ public class TweetStub {
     }
 
     /**
-     * Main function for searching tweets given the filters.
-     *
+     * Main function to search tweets with the normal consumer group strategy
      * @param id               of requester.
      * @param locationToFollow location filters.
      * @param userToFollow     tag filters.
@@ -84,6 +82,33 @@ public class TweetStub {
      * @return the latest tweet filtered using the filters params.
      */
     List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow) {
+        return findTweets(id, locationToFollow, userToFollow, tagToFollow, false);
+    }
+
+    /**
+     * Function used to retrieve tweets in the SSERoutine
+     *
+     * @param id               of requester.
+     * @param locationToFollow location filters.
+     * @param userToFollow     tag filters.
+     * @param tagToFollow      mention filters.
+     * @return the latest tweet filtered using the filters params.
+     */
+    List<Tweet> findTweetsSubscription(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow) {
+        return findTweets(id, locationToFollow, userToFollow, tagToFollow, true);
+    }
+
+    /**
+     * Generic function for searching tweets given the filters.
+     *
+     * @param id               of requester.
+     * @param locationToFollow location filters.
+     * @param userToFollow     tag filters.
+     * @param tagToFollow      mention filters.
+     * @param subscribe        used for using the singleton consumer group
+     * @return the latest tweet filtered using the filters params.
+     */
+    private List<Tweet> findTweets(String id, List<String> locationToFollow, List<String> userToFollow, List<String> tagToFollow, boolean subscribe) {
 
         //taking out filters by locations, userFollowed and tags
         String locationFilters = StringUtils.join(locationToFollow, "");
@@ -106,13 +131,24 @@ public class TweetStub {
 
         List<Tweet> tweets;
         if (!locationToFollow.isEmpty()) {
-            tweets = findLatestByLocations(id, locationToFollow, filter);
+
+            if (subscribe)
+                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getAllSubscribeConsumerGroup());
+            else
+                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getConsumerGroup(Topic.LOCATION, id));
+
         } else if (userToFollow.isEmpty()) {
             //filter tweet using only tag.
-            tweets = findLatestByTags(id, tagToFollow, filter);
+            if (subscribe)
+                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getAllSubscribeConsumerGroup());
+            else
+                tweets = findLatestByTags(id, tagToFollow, filter, ConsumerFactory.getConsumerGroup(Topic.TAG, id));
         } else
             //filter tweet using users mentioned (and tag if present).
-            tweets = findLatestByMentions(id, userToFollow, filter);
+            if (subscribe)
+                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getAllSubscribeConsumerGroup());
+            else
+                tweets = findLatestByMentions(id, userToFollow, filter, ConsumerFactory.getConsumerGroup(Topic.MENTION, id));
 
         System.out.println("Before filtering");
         tweets.forEach(System.out::println);
@@ -134,8 +170,8 @@ public class TweetStub {
      * @param filter   the filters for the research.
      * @return the latest tweet filtered by location.
      */
-    List<Tweet> findLatestByLocations(String id, List<String> locations, String filter) {
-        //The topic we are reading from.
+    List<Tweet> findLatestByLocations(String id, List<String> locations, String filter, List<Consumer<String, String>> consumerGroup) {
+ /*       //The topic we are reading from.
         String topic = Topic.LOCATION;
         //Getting the consumer.
         //TODO: make consumer group id unique
@@ -143,7 +179,7 @@ public class TweetStub {
         new Random().nextBytes(array);
         String generatedString = new String(array, Charset.forName("UTF-8"));
         List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,generatedString);
-
+*/
         /*
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         consumers.forEach(consumer -> {
@@ -157,7 +193,8 @@ public class TweetStub {
                 e.printStackTrace();
             }
         });*/
-        List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
+
+        return consumerGroup.stream().parallel().map(consumer -> {
             //consumer.poll(Duration.ofMillis(0));
             Set<TopicPartition> partitions = consumer.assignment();
             partitions.forEach(part -> {
@@ -172,7 +209,7 @@ public class TweetStub {
             //Polling the data.
             do {
                 ts.clear();
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
                 //Transforming data and filtering. (!Only by location)
 
                 records.forEach(record -> {
@@ -195,10 +232,7 @@ public class TweetStub {
             });
 
             return tweets;
-        }).reduce((l1,l2) -> {
-            return TweetFilter.sort(l1,l2);
-        }).orElseGet(null);
-        return totalTweets;
+        }).reduce(TweetFilter::sort).orElseGet(null);
     }
 
     /**
@@ -227,8 +261,8 @@ public class TweetStub {
      * @param filter the filters for the research.
      * @return the latest tweet filtered by tags.
      */
-    List<Tweet> findLatestByTags(String id, List<String> tags, String filter) {
-        //The topic we are reading from.
+    List<Tweet> findLatestByTags(String id, List<String> tags, String filter, List<Consumer<String, String>> consumerGroup) {
+      /*  //The topic we are reading from.
         String topic = Topic.TAG;
         //TODO: make consumer group id unique
         byte[] array = new byte[7]; // length is bounded by 7
@@ -236,8 +270,8 @@ public class TweetStub {
         String generatedString = new String(array, Charset.forName("UTF-8"));
         List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,generatedString);
         //List<Consumer<String, String>> consumers = ConsumerFactory.getConsumerGroup(topic,"consumer-group");
-
-        List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
+*/
+        return consumerGroup.stream().parallel().map(consumer -> {
             consumer.poll(Duration.ofMillis(0));
             Set<TopicPartition> partitions = consumer.assignment();
             partitions.forEach(part -> {
@@ -275,11 +309,7 @@ public class TweetStub {
             });
 
             return tweets;
-        }).reduce((l1,l2) -> {
-            return TweetFilter.sort(l1,l2);
-        }).orElseGet(null);
-        return totalTweets;
-
+        }).reduce(TweetFilter::sort).orElseGet(null);
     }
 
     /**
@@ -290,8 +320,8 @@ public class TweetStub {
      * @param filter   the filters for the research.
      * @return the latest tweet filtered by user.
      */
-    List<Tweet> findLatestByMentions(String id, List<String> mentions, String filter) {
-
+    List<Tweet> findLatestByMentions(String id, List<String> mentions, String filter, List<Consumer<String, String>> consumerGroup) {
+/*
         //The topic we are reading from.
         String topic = Topic.MENTION;
         //TODO: make consumer group id unique
@@ -300,8 +330,8 @@ public class TweetStub {
         String generatedString = new String(array, Charset.forName("UTF-8"));
         List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,generatedString);
         //List<Consumer<String,String>> consumers =  ConsumerFactory.getConsumerGroup(topic,"consumer-group");
-
-        List<Tweet> totalTweets = consumers.stream().parallel().map(consumer -> {
+*/
+        return consumerGroup.stream().parallel().map(consumer -> {
             consumer.poll(Duration.ofMillis(0));
             Set<TopicPartition> partitions = consumer.assignment();
             partitions.forEach(part -> {
@@ -339,11 +369,7 @@ public class TweetStub {
             });
 
             return tweets;
-        }).reduce((l1,l2) -> {
-            return TweetFilter.sort(l1,l2);
-        }).orElseGet(null);
-        return totalTweets;
-
+        }).reduce(TweetFilter::sort).orElseGet(null);
     }
 
     public boolean subscription(String id, List<String> locations, List<String> tags, List<String> mentions) {
