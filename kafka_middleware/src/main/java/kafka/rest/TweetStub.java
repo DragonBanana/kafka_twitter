@@ -129,13 +129,18 @@ public class TweetStub {
                 (userToFollow.get(0).equals("@all") && userToFollow.size() == 1))
             userToFollow = new ArrayList<>();
 
+
+        System.out.println("Entering find tweets method");
         List<Tweet> tweets;
         if (!locationToFollow.isEmpty()) {
             List<Consumer<String, String>> consumerGroup;
             if (subscribe){
+                System.out.println("Entering find tweets -> subscribe find by location method");
                 consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
+                System.out.println("Entering find tweets -> subscribe find by location method");
                 tweets = findLatestByLocations(id, locationToFollow, filter, consumerGroup);
             }else{
+                System.out.println("Entering find tweets -> find by location method");
                 consumerGroup = ConsumerFactory.getConsumerGroup(Topic.LOCATION, id);
                 tweets = findLatestByLocations(id, locationToFollow, filter, consumerGroup);
                 consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
@@ -143,9 +148,11 @@ public class TweetStub {
         } else if (userToFollow.isEmpty()) {
             List<Consumer<String, String>> consumerGroup;
             if (subscribe) {
+                System.out.println("Entering find tweets -> subscribe find by tag method");
                 consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
                 tweets = findLatestByTags(id, tagToFollow, filter, consumerGroup);
             }else {
+                System.out.println("Entering find tweets -> find by tag method");
                 consumerGroup = ConsumerFactory.getConsumerGroup(Topic.TAG, id);
                 tweets = findLatestByTags(id, tagToFollow, filter, consumerGroup);
                 consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
@@ -153,10 +160,12 @@ public class TweetStub {
         } else {
             List<Consumer<String, String>> consumerGroup;
             if (subscribe) {
+                System.out.println("Entering find tweets -> subscribe find by mention method");
                 consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
                 tweets = findLatestByMentions(id, userToFollow, filter, consumerGroup);
             }
             else {
+                System.out.println("Entering find tweets -> find by mention method");
                 consumerGroup = ConsumerFactory.getConsumerGroup(Topic.MENTION, id);
                 tweets = findLatestByMentions(id, userToFollow, filter, consumerGroup);
                 consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
@@ -183,7 +192,7 @@ public class TweetStub {
      * @return the latest tweet filtered by location.
      */
     List<Tweet> findLatestByLocations(String id, List<String> locations, String filter, List<Consumer<String, String>> consumerGroup) {
- /*       //The topic we are reading from.
+ /*     //The topic we are reading from.
         String topic = Topic.LOCATION;
         //Getting the consumer.
         //TODO: make consumer group id unique
@@ -205,7 +214,7 @@ public class TweetStub {
                 e.printStackTrace();
             }
         });*/
-
+        System.out.println("Finding latest by location");
         return consumerGroup.stream().parallel().map(consumer -> {
             //consumer.poll(Duration.ofMillis(0));
             Set<TopicPartition> partitions = consumer.assignment();

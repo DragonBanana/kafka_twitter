@@ -84,9 +84,9 @@
       */
      public static List<Consumer<String, String>> getAllSubscribeConsumerGroup() {
          List<Consumer<String, String>> list = new ArrayList<>();
-         list.addAll(locationSubscribers);
-         list.addAll(tagSubscribers);
-         list.addAll(mentionSubscribers);
+         list.addAll(Objects.requireNonNull(getSubscribeConsumerGroup(Topic.LOCATION)));
+         list.addAll(Objects.requireNonNull(getSubscribeConsumerGroup(Topic.TAG)));
+         list.addAll(Objects.requireNonNull(getSubscribeConsumerGroup(Topic.MENTION)));
          return list;
      }
 
