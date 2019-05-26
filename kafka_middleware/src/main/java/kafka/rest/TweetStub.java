@@ -131,25 +131,30 @@ public class TweetStub {
 
         List<Tweet> tweets;
         if (!locationToFollow.isEmpty()) {
-
+            List<Consumer<String, String>> consumerGroup;
             if (subscribe)
-                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getAllSubscribeConsumerGroup());
+                consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
             else
-                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getConsumerGroup(Topic.LOCATION, id));
-
+                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.LOCATION, id);
+            tweets = findLatestByLocations(id, locationToFollow, filter, consumerGroup);
+            consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
         } else if (userToFollow.isEmpty()) {
-            //filter tweet using only tag.
+            List<Consumer<String, String>> consumerGroup;
             if (subscribe)
-                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getAllSubscribeConsumerGroup());
+                consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
             else
-                tweets = findLatestByTags(id, tagToFollow, filter, ConsumerFactory.getConsumerGroup(Topic.TAG, id));
-        } else
-            //filter tweet using users mentioned (and tag if present).
+                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.TAG, id);
+            tweets = findLatestByTags(id, tagToFollow, filter, consumerGroup);
+            consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
+        } else {
+            List<Consumer<String, String>> consumerGroup;
             if (subscribe)
-                tweets = findLatestByLocations(id, locationToFollow, filter, ConsumerFactory.getAllSubscribeConsumerGroup());
+                consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
             else
-                tweets = findLatestByMentions(id, userToFollow, filter, ConsumerFactory.getConsumerGroup(Topic.MENTION, id));
-
+                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.MENTION, id);
+            tweets = findLatestByMentions(id, userToFollow, filter, consumerGroup);
+            consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
+        }
         System.out.println("Before filtering");
         tweets.forEach(System.out::println);
 
@@ -230,7 +235,6 @@ public class TweetStub {
                 //Saving the new offset for EOS.
                 new AzureDBConn().put(new Offset(id, filter, part.partition(), offset));
             });
-
             return tweets;
         }).reduce(TweetFilter::sort).orElseGet(null);
     }
@@ -307,7 +311,6 @@ public class TweetStub {
                 System.out.println("part: " + part + " new offset: " + offset);
                 new AzureDBConn().put(new Offset(id, filter, part.partition(), offset));
             });
-
             return tweets;
         }).reduce(TweetFilter::sort).orElseGet(null);
     }
