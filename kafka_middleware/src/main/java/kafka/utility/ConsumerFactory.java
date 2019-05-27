@@ -43,6 +43,8 @@
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100000");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "10000");
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "1000");
         List<Consumer<String, String>> consumerList = new ArrayList<>();
         for(int i = 0; i < N_CONSUMER; i++) {
             consumerList.add(new KafkaConsumer<>(props));

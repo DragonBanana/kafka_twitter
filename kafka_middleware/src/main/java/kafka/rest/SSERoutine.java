@@ -52,35 +52,83 @@ public class SSERoutine implements Runnable {
 
                 List<Tweet> tweets = new ArrayList<>();
                 if (!locationsFollowed.isEmpty()) {
-                    List<Tweet> finalPartialTweetsLocations = partialTweetsLocations;
-                    locationsFollowed.forEach(location -> finalPartialTweetsLocations.addAll(tweetStub.findTweetsSubscription(user.getId(),
-                            Collections.singletonList(location),
-                            Collections.singletonList("@all"),
-                            Collections.singletonList("#all"))));
+                    partialTweetsLocations = locationsFollowed
+                            .stream()
+                            .map(location -> tweetStub.findTweetsSubscription(user.getId(),
+                                    Collections.singletonList(location),
+                                    Collections.singletonList("@all"),
+                                    Collections.singletonList("#all")))
+                            .reduce((l1,l2) -> {l1.addAll(l2); return l1;})
+                            .get();
+                    partialTweetsLocations = partialTweetsLocations
+                            .parallelStream()
+                            .distinct()
+                            .sorted((x, y) -> {
+                                if(Long.parseLong(x.getTimestamp()) > Long.parseLong(y.getTimestamp()))
+                                    return 1;
+                                else if(Long.parseLong(x.getTimestamp()) == Long.parseLong(y.getTimestamp()))
+                                    return 0;
+                                return -1;
+                            })
+                            .collect(Collectors.toList());
                 }
-                    System.out.println(tweets.size());
-                partialTweetsLocations = partialTweetsLocations.stream().distinct().collect(Collectors.toList());
                 if (!tagsFollowed.isEmpty()) {
-                    List<Tweet> finalPartialTweetsTags = partialTweetsTags;
-                    tagsFollowed.forEach(tag -> finalPartialTweetsTags.addAll(tweetStub.findTweetsSubscription(user.getId(),
-                            Collections.singletonList("all"),
-                            Collections.singletonList("@all"),
-                            Collections.singletonList(tag))));
-                    System.out.println(tweets.size());
-                    partialTweetsTags = partialTweetsTags.stream().distinct().collect(Collectors.toList());
+                    partialTweetsTags = tagsFollowed
+                            .stream()
+                            .map(tag -> tweetStub.findTweetsSubscription(user.getId(),
+                                    Collections.singletonList("all"),
+                                    Collections.singletonList("@all"),
+                                    Collections.singletonList(tag)))
+                            .reduce((l1,l2) -> {l1.addAll(l2); return l1;})
+                            .get();
+                    System.out.println(partialTweetsTags.size());
+                    partialTweetsTags = partialTweetsTags
+                            .parallelStream()
+                            .distinct()
+                            .sorted((x, y) -> {
+                                if(Long.parseLong(x.getTimestamp()) > Long.parseLong(y.getTimestamp()))
+                                    return 1;
+                                else if(Long.parseLong(x.getTimestamp()) == Long.parseLong(y.getTimestamp()))
+                                    return 0;
+                                return -1;
+                            })
+                            .collect(Collectors.toList());
+
                 }
                 if (!usersFollowed.isEmpty()) {
-                    List<Tweet> finalPartialTweetsMentions = partialTweetsMentions;
-                    usersFollowed.forEach(mention -> finalPartialTweetsMentions.addAll(tweetStub.findTweetsSubscription(user.getId(),
-                            Collections.singletonList("all"),
-                            Collections.singletonList(mention),
-                            Collections.singletonList("#all"))));
-                    System.out.println(tweets.size());
-                    partialTweetsMentions = partialTweetsMentions.stream().distinct().collect(Collectors.toList());
+                    partialTweetsMentions = usersFollowed
+                            .stream()
+                            .map(mention -> tweetStub.findTweetsSubscription(user.getId(),
+                                    Collections.singletonList("all"),
+                                    Collections.singletonList(mention),
+                                    Collections.singletonList("#all")))
+                            .reduce((l1,l2) -> {l1.addAll(l2); return l1;})
+                            .get();
+                    partialTweetsMentions = partialTweetsMentions
+                            .parallelStream()
+                            .distinct()
+                            .sorted((x, y) -> {
+                                if(Long.parseLong(x.getTimestamp()) > Long.parseLong(y.getTimestamp()))
+                                    return 1;
+                                else if(Long.parseLong(x.getTimestamp()) == Long.parseLong(y.getTimestamp()))
+                                    return 0;
+                                return -1;
+                            })
+                            .collect(Collectors.toList());
                 }
 
                 List<Tweet> partialResult = TweetFilter.sort(partialTweetsLocations, partialTweetsTags);
+                partialResult.stream().reduce((l1,l2) -> {
+                    if(Long.parseLong(l1.getTimestamp()) > Long.parseLong(l2.getTimestamp())) {
+                        System.out.println("Urca, alla fine non li hai riordinati bene");
+                        System.out.println(l1.getTimestamp() + " is > then " + l2.getTimestamp());
+                    }
+                    return l2;
+                });
                 tweets = TweetFilter.sort(partialResult, partialTweetsMentions);
+
+                //Check if tweets are ordered
+                //TODO togliere sta roba
 
                 //filter duplicate tweets
                 final List<Tweet> ts = tweets.stream().distinct().collect(Collectors.toList());

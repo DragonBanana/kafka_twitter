@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class TweetStub {
 
@@ -136,7 +137,7 @@ public class TweetStub {
             List<Consumer<String, String>> consumerGroup;
             if (subscribe){
                 System.out.println("Entering find tweets -> subscribe find by location method");
-                consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
+                consumerGroup = ConsumerFactory.getSubscribeConsumerGroup(Topic.LOCATION);
                 System.out.println("Entering find tweets -> subscribe find by location method");
                 tweets = findLatestByLocations(id, locationToFollow, filter, consumerGroup);
             }else{
@@ -149,7 +150,7 @@ public class TweetStub {
             List<Consumer<String, String>> consumerGroup;
             if (subscribe) {
                 System.out.println("Entering find tweets -> subscribe find by tag method");
-                consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
+                consumerGroup = ConsumerFactory.getSubscribeConsumerGroup(Topic.TAG);
                 tweets = findLatestByTags(id, tagToFollow, filter, consumerGroup);
             }else {
                 System.out.println("Entering find tweets -> find by tag method");
@@ -161,7 +162,7 @@ public class TweetStub {
             List<Consumer<String, String>> consumerGroup;
             if (subscribe) {
                 System.out.println("Entering find tweets -> subscribe find by mention method");
-                consumerGroup = ConsumerFactory.getAllSubscribeConsumerGroup();
+                consumerGroup = ConsumerFactory.getSubscribeConsumerGroup(Topic.MENTION);
                 tweets = findLatestByMentions(id, userToFollow, filter, consumerGroup);
             }
             else {
@@ -180,6 +181,16 @@ public class TweetStub {
 
         System.out.println("After filtering");
         tweets.forEach(System.out::println);
+        tweets = tweets
+                .parallelStream()
+                .sorted((x, y) -> {
+                    if(Long.parseLong(x.getTimestamp()) > Long.parseLong(y.getTimestamp()))
+                        return 1;
+                    else if(Long.parseLong(x.getTimestamp()) == Long.parseLong(y.getTimestamp()))
+                        return 0;
+                    return -1;
+                })
+                .collect(Collectors.toList());
         return tweets;
     }
 
