@@ -127,9 +127,6 @@ public class SSERoutine implements Runnable {
                 });
                 tweets = TweetFilter.sort(partialResult, partialTweetsMentions);
 
-                //Check if tweets are ordered
-                //TODO togliere sta roba
-
                 //filter duplicate tweets
                 final List<Tweet> ts = tweets.stream().distinct().collect(Collectors.toList());
 
