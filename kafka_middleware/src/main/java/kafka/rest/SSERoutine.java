@@ -3,6 +3,7 @@ package kafka.rest;
 import kafka.model.Tweet;
 import kafka.model.Twitter;
 import kafka.model.User;
+import kafka.utility.TweetFilter;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
@@ -43,29 +44,43 @@ public class SSERoutine implements Runnable {
                 List<String> tagsFollowed = subscription.getTagsFollowed();
                 List<String> usersFollowed = subscription.getUsersFollowed();
 
+                List<Tweet> partialTweetsLocations = new ArrayList<>();
+                List<Tweet> partialTweetsTags = new ArrayList<>();
+                List<Tweet> partialTweetsMentions = new ArrayList<>();
+
                 //poll()
 
-                final List<Tweet> tweets = new ArrayList<>();
-                if (!locationsFollowed.isEmpty())
-                    locationsFollowed.forEach(location -> tweets.addAll(tweetStub.findTweetsSubscription(user.getId(),
+                List<Tweet> tweets = new ArrayList<>();
+                if (!locationsFollowed.isEmpty()) {
+                    List<Tweet> finalPartialTweetsLocations = partialTweetsLocations;
+                    locationsFollowed.forEach(location -> finalPartialTweetsLocations.addAll(tweetStub.findTweetsSubscription(user.getId(),
                             Collections.singletonList(location),
                             Collections.singletonList("@all"),
                             Collections.singletonList("#all"))));
+                }
                     System.out.println(tweets.size());
+                partialTweetsLocations = partialTweetsLocations.stream().distinct().collect(Collectors.toList());
                 if (!tagsFollowed.isEmpty()) {
-                    tagsFollowed.forEach(tag -> tweets.addAll(tweetStub.findTweetsSubscription(user.getId(),
+                    List<Tweet> finalPartialTweetsTags = partialTweetsTags;
+                    tagsFollowed.forEach(tag -> finalPartialTweetsTags.addAll(tweetStub.findTweetsSubscription(user.getId(),
                             Collections.singletonList("all"),
                             Collections.singletonList("@all"),
                             Collections.singletonList(tag))));
                     System.out.println(tweets.size());
+                    partialTweetsTags = partialTweetsTags.stream().distinct().collect(Collectors.toList());
                 }
                 if (!usersFollowed.isEmpty()) {
-                    usersFollowed.forEach(mention -> tweets.addAll(tweetStub.findTweetsSubscription(user.getId(),
+                    List<Tweet> finalPartialTweetsMentions = partialTweetsMentions;
+                    usersFollowed.forEach(mention -> finalPartialTweetsMentions.addAll(tweetStub.findTweetsSubscription(user.getId(),
                             Collections.singletonList("all"),
                             Collections.singletonList(mention),
                             Collections.singletonList("#all"))));
                     System.out.println(tweets.size());
+                    partialTweetsMentions = partialTweetsMentions.stream().distinct().collect(Collectors.toList());
                 }
+
+                List<Tweet> partialResult = TweetFilter.sort(partialTweetsLocations, partialTweetsTags);
+                tweets = TweetFilter.sort(partialResult, partialTweetsMentions);
 
                 //filter duplicate tweets
                 final List<Tweet> ts = tweets.stream().distinct().collect(Collectors.toList());

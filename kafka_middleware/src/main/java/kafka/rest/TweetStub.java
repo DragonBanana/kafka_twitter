@@ -141,7 +141,7 @@ public class TweetStub {
                 tweets = findLatestByLocations(id, locationToFollow, filter, consumerGroup);
             }else{
                 System.out.println("Entering find tweets -> find by location method");
-                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.LOCATION, id);
+                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.LOCATION, id + "-location");
                 tweets = findLatestByLocations(id, locationToFollow, filter, consumerGroup);
                 consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
             }
@@ -153,7 +153,7 @@ public class TweetStub {
                 tweets = findLatestByTags(id, tagToFollow, filter, consumerGroup);
             }else {
                 System.out.println("Entering find tweets -> find by tag method");
-                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.TAG, id);
+                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.TAG, id + "-tag");
                 tweets = findLatestByTags(id, tagToFollow, filter, consumerGroup);
                 consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
             }
@@ -166,7 +166,7 @@ public class TweetStub {
             }
             else {
                 System.out.println("Entering find tweets -> find by mention method");
-                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.MENTION, id);
+                consumerGroup = ConsumerFactory.getConsumerGroup(Topic.MENTION, id + "-mention");
                 tweets = findLatestByMentions(id, userToFollow, filter, consumerGroup);
                 consumerGroup.forEach(c -> c.close(Duration.ofMillis(5000)));
             }
