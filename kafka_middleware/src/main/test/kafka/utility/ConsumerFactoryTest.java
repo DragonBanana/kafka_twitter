@@ -18,7 +18,7 @@ public class ConsumerFactoryTest {
      */
     @Test
     public void getConsumer() {
-        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        Consumer<String, String> consumer = ConsumerFactory.getConsumer("test-group");
         List<PartitionInfo> infos = new ArrayList<>();
         consumer.listTopics().values().forEach(infos::addAll);
         List<String> topics = infos.stream().map(PartitionInfo::topic).collect(Collectors.toList());

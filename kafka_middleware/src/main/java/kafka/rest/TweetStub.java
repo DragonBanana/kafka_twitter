@@ -63,7 +63,7 @@ public class TweetStub {
         //Send data to Kafka
         for (ProducerRecord<String, String> record : records) {
             Producer<String, String> producer = ProducerFactory.getTweetProducer();
-
+            System.out.println("record: " + record);
             producer.initTransactions();
             try {
                 producer.beginTransaction();
@@ -153,7 +153,7 @@ public class TweetStub {
         //The topic we are reading from.
         String topic = Topic.LOCATION;
         //Getting the consumer.
-        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        Consumer<String, String> consumer = ConsumerFactory.getConsumer(id+filter);
         //Getting the partition of the topic.
         int partition = TopicPartitionFactory.getLocationPartition(location);
         //Creating the topic partition object (it is required in the next instructions).
@@ -214,22 +214,25 @@ public class TweetStub {
         String topic = Topic.TAG;
         //Getting the consumer.
         //Declaring two partitions: the first for 1 tag search, the second for blob search.
-        List<TopicPartition> topicPartitions = new ArrayList<>();
 
         return tags.stream().parallel().map(tag -> {
+            List<TopicPartition> topicPartitions = new ArrayList<>();
             //Getting the partition of the topic.
             System.out.println("tag to partition: " + tag);
             int partition = TopicPartitionFactory.getTagPartition(tag);
+            System.out.println("partition: " + partition);
             //Creating the topic partition object (it is required in the next instructions).
             topicPartitions.add(new TopicPartition(topic, partition));
 
-            //Rendila parametrica, serve un consumer group id diverso!!
-            Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+            //TODO: Rendila parametrica, serve un consumer group id diverso!!
+            String group = id+filter;
+            Consumer<String, String> consumer = ConsumerFactory.getConsumer(group);
             //subscribe to a topic
             consumer.assign(topicPartitions);
 
 
             TopicPartition topicPartition = (TopicPartition) consumer.assignment().toArray()[0];
+            System.out.println("topic partition: " + topicPartition.partition());
 
             //Getting the offset from the db.
             long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
@@ -260,6 +263,7 @@ public class TweetStub {
 
             //Getting the new offset.
             long finalOffset = consumer.position(topicPartition);
+            System.out.println("FinalOffset: " + finalOffset);
 
             //Saving the new offset for EOS.
             new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), finalOffset));
@@ -281,8 +285,65 @@ public class TweetStub {
 
         //The topic we are reading from.
         String topic = Topic.MENTION;
+        return mentions.stream().parallel().map(mention -> {
+            List<TopicPartition> topicPartitions = new ArrayList<>();
+            //Getting the partition of the topic.
+            System.out.println("mention to partition: " + mention);
+            int partition = TopicPartitionFactory.getMentionPartition(mention);
+            System.out.println("partition: " + partition);
+            //Creating the topic partition object (it is required in the next instructions).
+            topicPartitions.add(new TopicPartition(topic, partition));
+
+            //TODO: Rendila parametrica, serve un consumer group id diverso!!
+            String group = id+filter;
+            Consumer<String, String> consumer = ConsumerFactory.getConsumer(group);
+            //subscribe to a topic
+            consumer.assign(topicPartitions);
+
+
+            TopicPartition topicPartition = (TopicPartition) consumer.assignment().toArray()[0];
+            System.out.println("topic partition: " + topicPartition.partition());
+
+            //Getting the offset from the db.
+            long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
+            //Moving the offset.
+            System.out.println("tag offset to seek: " + offset);
+            consumer.seek(topicPartition, offset);
+
+
+            List<Tweet> ts = new ArrayList<>();
+            List<Tweet> tweets = new ArrayList<>();
+            do {
+                ts.clear();
+                //Polling the data.
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
+                System.out.println("before find latest");
+                records.forEach(System.out::println);
+                //Transforming data and filtering. (!Only by mention)
+                records.forEach(record -> {
+                    Tweet t = new Gson().fromJson(record.value(), Tweet.class);
+                    if (t.getMentions().contains(mention)) {
+                        ts.add(t);
+                    }
+                });
+                System.out.println("after find latest");
+                ts.forEach(System.out::println);
+                tweets.addAll(ts);
+            } while (!ts.isEmpty());
+
+            //Getting the new offset.
+            long finalOffset = consumer.position(topicPartition);
+            System.out.println("FinalOffset: " + finalOffset);
+
+            //Saving the new offset for EOS.
+            new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), finalOffset));
+
+            //Returning the data
+            return tweets;
+        }).distinct().reduce(TweetFilter::sort).orElseGet(null);
+
         //Getting the consumer.
-        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+        /*Consumer<String, String> consumer = ConsumerFactory.getConsumer(id+filter);
         //Declaring two partitions: the first for 1 mention search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
         System.out.println("mentions size: " + mentions.size());
@@ -335,7 +396,7 @@ public class TweetStub {
             new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), offset));
 
         });
-        return tweets;
+        return tweets;*/
     }
 
     public boolean subscription(String id, List<String> locations, List<String> tags, List<String> mentions) {

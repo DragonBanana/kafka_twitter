@@ -35,16 +35,18 @@ public class TopicPartitionFactory {
      * @param location the input key.
      * @return the partition of the location.
      */
+
+    //TODO: MAKE ONLY ONE FUNCTION
     public static int getLocationPartition(String location) {
         return Math.abs(location.hashCode()) % TopicPartitionFactory.LOCATION_PARTITIONS;
     }
 
     public static int getTagPartition(String tag) {
-        return Math.abs(tag.hashCode()) % (TopicPartitionFactory.TAG_PARTITIONS - 1);
+        return Math.abs(tag.hashCode()) % (TopicPartitionFactory.TAG_PARTITIONS);
     }
 
     public static int getMentionPartition(String mention) {
-        return Math.abs(mention.hashCode()) % (TopicPartitionFactory.MENTION_PARTITIONS - 1);
+        return Math.abs(mention.hashCode()) % (TopicPartitionFactory.MENTION_PARTITIONS);
     }
 
 

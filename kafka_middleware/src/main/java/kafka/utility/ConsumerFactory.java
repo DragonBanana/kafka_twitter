@@ -13,20 +13,20 @@ public class ConsumerFactory {
      * Return the consumer.
      * @return the consumer.
      */
-    public static Consumer<String, String> getConsumer() {
-        return new KafkaConsumer<>(getDefaultProperty());
+    public static Consumer<String, String> getConsumer(String group) {
+        return new KafkaConsumer<>(getDefaultProperty(group));
     }
 
     /**
      * Return the default producer properties.
      * @return the default producer properties.
      */
-    private static Properties getDefaultProperty() {
+    private static Properties getDefaultProperty(String group) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32789");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, group);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100000");
        // props.put(ConsumerConfig.CLIENT_ID_CONFIG, "consumer-client");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
