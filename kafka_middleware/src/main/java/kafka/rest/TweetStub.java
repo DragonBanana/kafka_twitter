@@ -35,15 +35,29 @@ public class TweetStub {
     Tweet save(Tweet tweet) {
 
         //Get the filters used in the tweet.
-        List<String> tweetFilters = tweet.getFilters();
+//        List<String> tweetFilters = tweet.getFilters();
         List<ProducerRecord<String, String>> records = new ArrayList<>();
 
+        String location = tweet.getLocation();
+        List<String> tags = tweet.getTags();
+        List<String> mentions = tweet.getMentions();
+
+        //Create a record fo the topic location
+        records.add(new ProducerRecord<>(Topic.LOCATION, location, new Gson().toJson(tweet, Tweet.class)));
+
+        if (tags != null && !tags.isEmpty())
+            tags.forEach(tag -> records.add(new ProducerRecord<>(Topic.TAG, tag, new Gson().toJson(tweet, Tweet.class))));
+
+        if (mentions != null && !mentions.isEmpty())
+            mentions.forEach(mention -> records.add(new ProducerRecord<>(Topic.MENTION, mention, new Gson().toJson(tweet, Tweet.class))));
+
+        /*
         //Check where the tweet must be saved
         for (String filter : tweetFilters) {
             records.add(new ProducerRecord<>(filter, tweet.getLocation(),
                     new Gson().toJson(tweet, Tweet.class)));
         }
-
+*/
         long timestamp = 0;
 
         //Send data to Kafka
@@ -199,61 +213,60 @@ public class TweetStub {
         //The topic we are reading from.
         String topic = Topic.TAG;
         //Getting the consumer.
-        Consumer<String, String> consumer = ConsumerFactory.getConsumer();
         //Declaring two partitions: the first for 1 tag search, the second for blob search.
         List<TopicPartition> topicPartitions = new ArrayList<>();
-        //if (tags.size() == 1) {
-        tags.forEach(t ->{
+
+        return tags.stream().parallel().map(tag -> {
             //Getting the partition of the topic.
-            System.out.println("tag to partition: " + t);
-            int partition = TopicPartitionFactory.getTagPartition(t);
+            System.out.println("tag to partition: " + tag);
+            int partition = TopicPartitionFactory.getTagPartition(tag);
             //Creating the topic partition object (it is required in the next instructions).
             topicPartitions.add(new TopicPartition(topic, partition));
-        });
-        //}
-        //Getting the partition of the topic.
-        int partition = TopicPartitionFactory.TAG_PARTITION_BLOB;
-        //Creating the topic partition object (it is required in the next instructions).
-        topicPartitions.add(new TopicPartition(topic, partition));
-        //Subscribe to a topic.
-        consumer.assign(topicPartitions);
-        topicPartitions
-                .forEach(topicPartition -> {
-                    //Getting the offset from the db.
-                    long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
-                    //Moving the offset.
-                    System.out.println("tag offset to seek: " + offset);
-                    consumer.seek(topicPartition, offset);
 
+            //Rendila parametrica, serve un consumer group id diverso!!
+            Consumer<String, String> consumer = ConsumerFactory.getConsumer();
+            //subscribe to a topic
+            consumer.assign(topicPartitions);
+
+
+            TopicPartition topicPartition = (TopicPartition) consumer.assignment().toArray()[0];
+
+            //Getting the offset from the db.
+            long offset = Math.max(new AzureDBConn().get(new OffsetKey(id, filter, topicPartition.partition())).getValue().getOffset(), 0);
+            //Moving the offset.
+            System.out.println("tag offset to seek: " + offset);
+            consumer.seek(topicPartition, offset);
+
+
+            List<Tweet> ts = new ArrayList<>();
+            List<Tweet> tweets = new ArrayList<>();
+            do {
+                ts.clear();
+                //Polling the data.
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
+                System.out.println("before find latest");
+                records.forEach(System.out::println);
+                //Transforming data and filtering. (!Only by tag)
+                records.forEach(record -> {
+                    Tweet t = new Gson().fromJson(record.value(), Tweet.class);
+                    if (t.getTags().contains(tag)) {
+                        ts.add(t);
+                    }
                 });
-        List<Tweet> ts = new ArrayList<>();
-        List<Tweet> tweets = new ArrayList<>();
-        do {
-            ts.clear();
-            //Polling the data.
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(5000));
-            System.out.println("before find latest");
-            records.forEach(System.out::println);
-            //Transforming data and filtering. (!Only by tag)
-            records.forEach(record -> {
-                Tweet t = new Gson().fromJson(record.value(), Tweet.class);
-                if (t.getTags().stream().anyMatch(tags::contains)) {
-                    ts.add(t);
-                }
-            });
-            System.out.println("after find latest");
-            ts.forEach(System.out::println);
-            tweets.addAll(ts);
-        } while (!ts.isEmpty());
-        topicPartitions.forEach(topicPartition -> {
-            //Getting the new offset.
-            long offset = consumer.position(topicPartition);
-            //Saving the new offset for EOS.
-            new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), offset));
+                System.out.println("after find latest");
+                ts.forEach(System.out::println);
+                tweets.addAll(ts);
+            } while (!ts.isEmpty());
 
-        });
-        //Returning the data
-        return tweets;
+            //Getting the new offset.
+            long finalOffset = consumer.position(topicPartition);
+
+            //Saving the new offset for EOS.
+            new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), finalOffset));
+
+            //Returning the data
+            return tweets;
+        }).distinct().reduce(TweetFilter::sort).orElseGet(null);
     }
 
     /**
