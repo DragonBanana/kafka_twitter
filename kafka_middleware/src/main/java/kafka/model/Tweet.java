@@ -1,7 +1,6 @@
 package kafka.model;
 
 import com.google.gson.Gson;
-import kafka.utility.TweetValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +135,8 @@ public class Tweet {
                     t.getLocation().equals(this.getLocation()) &&
                     t.getAuthor().equals(this.getAuthor()) &&
                     t.getContent().equals(this.getContent()) &&
-                    t.getTimestamp().equals(this.getTimestamp());
+                    t.getTimestamp().equals(this.getTimestamp()) ||
+                    t == this;
         }
         return false;
     }
