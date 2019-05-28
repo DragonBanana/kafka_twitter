@@ -32,7 +32,7 @@ public class ProducerFactory {
      */
     private static Properties getDefaultProperty() {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32778");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "23.97.231.221:32788");
         String transactionId = Double.toString(Math.abs(Math.random()));
         props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionId);
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
