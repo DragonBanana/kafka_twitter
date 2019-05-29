@@ -138,7 +138,17 @@ public class TweetStub {
 
         System.out.println("After filtering");
         tweets.forEach(System.out::println);
-        return tweets;
+
+        //Sorting
+        final List<Tweet> ts = tweets.parallelStream().sorted((l1,l2) -> {
+            if(Long.parseLong(l1.getTimestamp()) > Long.parseLong(l2.getTimestamp()))
+                return 1;
+            else if(Long.parseLong(l1.getTimestamp()) == Long.parseLong(l2.getTimestamp()))
+                return 0;
+            return -1;
+        }).collect(Collectors.toList());
+
+        return ts;
     }
 
     /**
@@ -180,6 +190,8 @@ public class TweetStub {
         offset = consumer.position(topicPartition);
         //Saving the new offset for EOS.
         new AzureDBConn().put(new Offset(id, filter, partition, offset));
+
+        consumer.close(Duration.ofMillis(2500));
         //Returning the data.
         return tweets;
     }
@@ -268,6 +280,8 @@ public class TweetStub {
             //Saving the new offset for EOS.
             new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), finalOffset));
 
+            consumer.close(Duration.ofMillis(2500));
+
             //Returning the data
             return tweets;
         }).distinct().reduce(TweetFilter::sort).orElseGet(null);
@@ -337,6 +351,8 @@ public class TweetStub {
 
             //Saving the new offset for EOS.
             new AzureDBConn().put(new Offset(id, filter, topicPartition.partition(), finalOffset));
+
+            consumer.close(Duration.ofMillis(2500));
 
             //Returning the data
             return tweets;

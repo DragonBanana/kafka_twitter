@@ -67,8 +67,14 @@ public class SSERoutine implements Runnable {
                     System.out.println(tweets.size());
                 }
 
-                //filter duplicate tweets
-                final List<Tweet> ts = tweets.stream().distinct().collect(Collectors.toList());
+                //Sorting and filtering
+                final List<Tweet> ts = tweets.parallelStream().sorted((l1,l2) -> {
+                    if(Long.parseLong(l1.getTimestamp()) > Long.parseLong(l2.getTimestamp()))
+                        return 1;
+                    else if(Long.parseLong(l1.getTimestamp()) == Long.parseLong(l2.getTimestamp()))
+                        return 0;
+                    return -1;
+                }).distinct().collect(Collectors.toList());
 
                 System.out.println("Location ");
                 locationsFollowed.forEach(System.out::println);
