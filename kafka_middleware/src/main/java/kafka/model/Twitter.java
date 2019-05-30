@@ -1,7 +1,7 @@
 package kafka.model;
 
 
-import kafka.rest.SSERoutine;
+import kafka.rest.WebSocketRoutine;
 import kafka.rest.TweetStub;
 
 import java.util.ArrayDeque;
@@ -72,7 +72,7 @@ public class Twitter {
     }
 
     /**
-     * Check if the SSERoutine is done
+     * Check if the WebSocketRoutine is done
      * @return true if the thread has ended otherwise false
      */
     public boolean isSSEDone() {
@@ -81,10 +81,10 @@ public class Twitter {
     }
 
     /**
-     * Starts SSERoutine
+     * Starts WebSocketRoutine
      * @param timestamp Upper bound of the window
      */
     public void startSSE(long timestamp) {
-        sseCompleted = sseRoutineThread.submit(new SSERoutine(timestamp, new TweetStub()));
+        sseCompleted = sseRoutineThread.submit(new WebSocketRoutine(timestamp, new TweetStub()));
     }
 }

@@ -12,13 +12,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SSERoutine implements Runnable {
+public class WebSocketRoutine implements Runnable {
 
     private final TweetStub tweetStub;
     private long timestamp;
     private final long window = Duration.ofSeconds(3).getSeconds() * 1000;
 
-    public SSERoutine(long timestamp, TweetStub tweetStub) {
+    public WebSocketRoutine(long timestamp, TweetStub tweetStub) {
         this.tweetStub = tweetStub;
         this.timestamp = timestamp;
     }

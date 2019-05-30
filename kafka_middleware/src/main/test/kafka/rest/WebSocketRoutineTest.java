@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class SSERoutineTest {
+public class WebSocketRoutineTest {
 
     @Test
     public void run1() {
@@ -20,7 +20,7 @@ public class SSERoutineTest {
         Mockito.when(tweetStub.findTweets("luca", null,null,null)).thenReturn(new ArrayList<>());
         Mockito.when(tweetStub.findTweets("davide", null,null,null)).thenReturn(new ArrayList<>());
 
-        SSERoutine sseRoutine = new SSERoutine(timestamp, tweetStub);
+        WebSocketRoutine webSocketRoutine = new WebSocketRoutine(timestamp, tweetStub);
 
         Twitter twitter = Twitter.getTwitter();
 
@@ -35,7 +35,7 @@ public class SSERoutineTest {
         davide.setVirtualClient(new VirtualClient());
 
 
-        sseRoutine.run();
+        webSocketRoutine.run();
 
         assertEquals( timestamp, (long) luca.getSubscriptionStub().lastPoll());
         assertEquals( timestamp, (long) davide.getSubscriptionStub().lastPoll());
@@ -48,7 +48,7 @@ public class SSERoutineTest {
         Mockito.when(tweetStub.findTweets("luca", null,null,null)).thenReturn(new ArrayList<>());
         Mockito.when(tweetStub.findTweets("davide", null,null,null)).thenReturn(new ArrayList<>());
 
-        SSERoutine sseRoutine = new SSERoutine(timestamp, tweetStub);
+        WebSocketRoutine webSocketRoutine = new WebSocketRoutine(timestamp, tweetStub);
 
         Twitter twitter = Twitter.getTwitter();
 
@@ -62,7 +62,7 @@ public class SSERoutineTest {
         luca.setVirtualClient(new VirtualClient());
         davide.setVirtualClient(new VirtualClient());
 
-        sseRoutine.run();
+        webSocketRoutine.run();
 
 
         assertNotEquals( timestamp, (long) luca.getSubscriptionStub().lastPoll());
@@ -79,7 +79,7 @@ public class SSERoutineTest {
         Mockito.when(tweetStub.findTweets("davide", null,null,null)).thenReturn(new ArrayList<>());
         Mockito.when(tweetStub.findTweets("alessio", null,null,null)).thenReturn(new ArrayList<>());
 
-        SSERoutine sseRoutine = new SSERoutine(timestamp, tweetStub);
+        WebSocketRoutine webSocketRoutine = new WebSocketRoutine(timestamp, tweetStub);
 
         Twitter twitter = Twitter.getTwitter();
 
@@ -98,7 +98,7 @@ public class SSERoutineTest {
 
         alessio.getSubscriptionStub().updatePoll((long) 399999);
 
-        sseRoutine.run();
+        webSocketRoutine.run();
 
         assertEquals( timestamp, (long) luca.getSubscriptionStub().lastPoll());
         assertEquals( timestamp, (long) davide.getSubscriptionStub().lastPoll());
