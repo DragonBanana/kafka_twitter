@@ -78,6 +78,6 @@ The application implements the EOS (Exactly Once Semantic). The application is u
 
 ## Authors
 
-* **Luca Ferrera** (https://github.com/lterrac)
+* **Luca Ferrera** (https://github.com/Luca-Ferrera)
 * **Davide Yi Xian Hu** (https://github.com/DragonBanana)
-* **Luca Terracciano** (https://github.com/Luca-Ferrera)
+* **Luca Terracciano** (https://github.com/lterrac)
